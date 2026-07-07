@@ -44,7 +44,7 @@ function RatingSparkline({ points }: { points: { rating: number }[] }) {
 
 export function AnalyticsPreview() {
   return (
-    <section id="analytics" className="mx-auto max-w-6xl px-6 py-20">
+    <section id="analytics" className="border-b border-border px-6 py-20">
       <div className="mx-auto mb-12 max-w-2xl text-center">
         <Badge variant="secondary" className="mb-4 font-mono">
           {analyticsPreview.eyebrow}

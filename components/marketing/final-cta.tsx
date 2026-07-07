@@ -5,7 +5,7 @@ import { finalCta } from "@/lib/marketing/content";
 
 export function FinalCta() {
   return (
-    <section className="bg-primary text-primary-foreground">
+    <section className="border-b border-primary-foreground/15 bg-primary text-primary-foreground">
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-20 text-center">
         <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
           {finalCta.heading}

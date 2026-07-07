@@ -3,8 +3,8 @@ import { howItWorks } from "@/lib/marketing/content";
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="border-y border-border bg-muted/30">
-      <div className="mx-auto max-w-6xl px-6 py-20">
+    <section id="how-it-works" className="border-b border-border bg-muted/30">
+      <div className="px-6 py-20">
         <div className="mx-auto mb-14 max-w-2xl text-center">
           <Badge variant="secondary" className="mb-4 font-mono">
             {howItWorks.eyebrow}

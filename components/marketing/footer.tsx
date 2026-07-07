@@ -5,8 +5,8 @@ import { footer } from "@/lib/marketing/content";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border">
-      <div className="mx-auto max-w-6xl px-6 py-12">
+    <footer>
+      <div className="px-6 py-12">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="flex flex-col gap-3">
             <Wordmark />

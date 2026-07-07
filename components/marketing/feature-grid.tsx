@@ -1,8 +1,8 @@
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   RankingIcon,
-  GitCompareIcon,
   Analytics01Icon,
+  GitCompareIcon,
   ShieldEnergyIcon,
   Share01Icon,
   Award01Icon,
@@ -15,16 +15,22 @@ import { featureGrid } from "@/lib/marketing/content";
 
 const icons = [
   RankingIcon,
-  GitCompareIcon,
   Analytics01Icon,
+  GitCompareIcon,
   ShieldEnergyIcon,
   Share01Icon,
   Award01Icon,
 ];
 
+const sizeClasses: Record<string, string> = {
+  wide: "sm:col-span-2",
+  tall: "sm:row-span-2",
+  sm: "",
+};
+
 export function FeatureGrid() {
   return (
-    <section id="features" className="mx-auto max-w-6xl px-6 py-20">
+    <section id="features" className="border-b border-border px-6 py-20">
       <div className="mx-auto mb-12 max-w-2xl text-center">
         <Badge variant="secondary" className="mb-4 font-mono">
           {featureGrid.eyebrow}
@@ -34,13 +40,13 @@ export function FeatureGrid() {
         </h2>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid auto-rows-fr grid-flow-dense gap-4 sm:grid-cols-3">
         {featureGrid.features.map((feature, i) => (
           <Card
             key={feature.title}
             className={cn(
-              "justify-start",
-              "span" in feature && feature.span && "sm:col-span-2 lg:col-span-2",
+              "flex h-full flex-col justify-start",
+              sizeClasses[feature.size],
             )}
           >
             <CardHeader>

@@ -7,7 +7,7 @@ import { problemSection } from "@/lib/marketing/content";
 
 export function ProblemSection() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="border-b border-border px-6 py-20">
       <div className="mx-auto mb-12 max-w-2xl text-center">
         <Badge variant="secondary" className="mb-4 font-mono">
           {problemSection.eyebrow}
@@ -19,7 +19,7 @@ export function ProblemSection() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="ring-destructive/15">
+        <Card className="ring-1 ring-border">
           <CardHeader>
             <CardTitle className="text-muted-foreground">
               {problemSection.before.label}
@@ -41,7 +41,7 @@ export function ProblemSection() {
           </CardContent>
         </Card>
 
-        <Card className="ring-primary/20">
+        <Card className="ring-1 ring-border">
           <CardHeader>
             <CardTitle className="text-primary">
               {problemSection.after.label}

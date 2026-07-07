@@ -91,27 +91,33 @@ export const featureGrid = {
       title: "Live university leaderboards",
       description:
         "Ranked by rating, problems solved, or contest performance — updated the moment new submissions land.",
-      span: true,
+      size: "wide",
+    },
+    {
+      title: "Progress analytics",
+      description:
+        "Submission heatmaps and rating history, tracked automatically — the detail a spreadsheet never captured.",
+      size: "tall",
     },
     {
       title: "Peer comparison",
       description: "Head-to-head stats against any classmate, section, or year.",
-    },
-    {
-      title: "Progress analytics",
-      description: "Submission heatmaps and rating history, tracked automatically.",
+      size: "sm",
     },
     {
       title: "Verified profiles",
       description: "Bio-code verification means every rank on the board is real.",
+      size: "sm",
     },
     {
       title: "Public share profile",
       description: "A shareable profile page for resumes and LinkedIn.",
+      size: "wide",
     },
     {
       title: "Contest tracking",
       description: "Upcoming and past contest performance, synced from LeetCode.",
+      size: "sm",
     },
   ],
 } as const;

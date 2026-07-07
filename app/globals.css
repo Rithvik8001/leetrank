@@ -140,3 +140,12 @@
     @apply font-sans;
   }
 }
+
+.bg-dotted {
+  background-image: radial-gradient(
+    circle,
+    var(--color-border) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}

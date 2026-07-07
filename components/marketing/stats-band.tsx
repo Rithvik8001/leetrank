@@ -2,8 +2,8 @@ import { statsBand } from "@/lib/marketing/content";
 
 export function StatsBand() {
   return (
-    <section className="border-y border-border bg-muted/30">
-      <div className="mx-auto max-w-6xl px-6 py-16">
+    <section className="border-b border-border bg-muted/30">
+      <div className="px-6 py-16">
         <div className="grid gap-8 sm:grid-cols-3">
           {statsBand.stats.map((stat) => (
             <div key={stat.label} className="text-center">

@@ -8,7 +8,7 @@ import { clubCta } from "@/lib/marketing/content";
 
 export function ClubCta() {
   return (
-    <section id="club-cta" className="mx-auto max-w-6xl px-6 py-4">
+    <section id="club-cta" className="border-b border-border px-6 py-16">
       <div className="flex flex-col items-start gap-6 rounded-2xl border border-primary/20 bg-secondary/40 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
         <div className="flex max-w-xl flex-col gap-3">
           <div className="flex items-center gap-2">
