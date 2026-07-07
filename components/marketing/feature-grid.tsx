@@ -1,4 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { IconSvgElement } from "@hugeicons/react";
 import {
   RankingIcon,
   Analytics01Icon,
@@ -9,8 +10,9 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
+import { FadeIn, StaggerGroup, StaggerItem } from "@/components/marketing/motion/reveal";
 import { featureGrid } from "@/lib/marketing/content";
 
 const icons = [
@@ -23,46 +25,51 @@ const icons = [
 ];
 
 const sizeClasses: Record<string, string> = {
-  wide: "sm:col-span-2",
-  tall: "sm:row-span-2",
-  sm: "",
+  wide: "lg:col-span-2",
+  tall: "lg:col-span-1 lg:row-span-2",
+  sm: "lg:col-span-1",
 };
+
+function makeIcon(icon: IconSvgElement) {
+  return function FeatureIcon({ className }: { className?: string }) {
+    return <HugeiconsIcon icon={icon} className={className} strokeWidth={2} />;
+  };
+}
 
 export function FeatureGrid() {
   return (
     <section id="features" className="border-b border-border px-6 py-20">
-      <div className="mx-auto mb-12 max-w-2xl text-center">
+      <FadeIn className="mx-auto mb-12 max-w-2xl text-center">
         <Badge variant="secondary" className="mb-4 font-mono">
           {featureGrid.eyebrow}
         </Badge>
         <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {featureGrid.heading}
         </h2>
-      </div>
+      </FadeIn>
 
-      <div className="grid auto-rows-fr grid-flow-dense gap-4 sm:grid-cols-3">
-        {featureGrid.features.map((feature, i) => (
-          <Card
-            key={feature.title}
-            className={cn(
-              "flex h-full flex-col justify-start",
-              sizeClasses[feature.size],
-            )}
-          >
-            <CardHeader>
-              <div className="mb-2 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <HugeiconsIcon icon={icons[i]} strokeWidth={2} />
-              </div>
-              <CardTitle>{feature.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {feature.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <StaggerGroup>
+        <BentoGrid className="auto-rows-[16rem]">
+          {featureGrid.features.map((feature, i) => (
+            <StaggerItem
+              key={feature.title}
+              className={cn("col-span-3", sizeClasses[feature.size])}
+            >
+              <BentoCard
+                name={feature.title}
+                description={feature.description}
+                href={feature.href}
+                cta={feature.cta}
+                Icon={makeIcon(icons[i])}
+                className="h-full"
+                background={
+                  <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl transition-transform duration-300 group-hover:scale-110" />
+                }
+              />
+            </StaggerItem>
+          ))}
+        </BentoGrid>
+      </StaggerGroup>
     </section>
   );
 }

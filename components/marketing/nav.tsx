@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Wordmark } from "@/components/wordmark";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
+import { MotionButton } from "@/components/marketing/motion/motion-button";
 import { MobileNav } from "@/components/marketing/mobile-nav";
 import { nav } from "@/lib/marketing/content";
 
@@ -28,9 +28,9 @@ export function Nav() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
-          <Button nativeButton={false} render={<Link href={nav.cta.href} />}>
+          <MotionButton nativeButton={false} render={<Link href={nav.cta.href} />}>
             {nav.cta.label}
-          </Button>
+          </MotionButton>
         </div>
 
         <div className="flex items-center gap-1 md:hidden">

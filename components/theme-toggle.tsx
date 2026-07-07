@@ -4,13 +4,13 @@ import { useTheme } from "next-themes";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Sun03Icon, Moon02Icon } from "@hugeicons/core-free-icons";
 
-import { Button } from "@/components/ui/button";
+import { MotionButton } from "@/components/marketing/motion/motion-button";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <Button
+    <MotionButton
       variant="ghost"
       size="icon"
       aria-label="Toggle theme"
@@ -22,6 +22,6 @@ export function ThemeToggle() {
         <HugeiconsIcon icon={Moon02Icon} strokeWidth={2} />
       )}
       <span className="sr-only">Toggle theme</span>
-    </Button>
+    </MotionButton>
   );
 }

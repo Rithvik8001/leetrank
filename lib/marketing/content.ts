@@ -92,32 +92,44 @@ export const featureGrid = {
       description:
         "Ranked by rating, problems solved, or contest performance — updated the moment new submissions land.",
       size: "wide",
+      href: "#universities",
+      cta: "View leaderboards",
     },
     {
       title: "Progress analytics",
       description:
         "Submission heatmaps and rating history, tracked automatically — the detail a spreadsheet never captured.",
       size: "tall",
+      href: "#analytics",
+      cta: "See the data",
     },
     {
       title: "Peer comparison",
       description: "Head-to-head stats against any classmate, section, or year.",
       size: "sm",
+      href: "/signup",
+      cta: "Compare stats",
     },
     {
       title: "Verified profiles",
       description: "Bio-code verification means every rank on the board is real.",
       size: "sm",
+      href: "#how-it-works",
+      cta: "How it works",
     },
     {
       title: "Public share profile",
       description: "A shareable profile page for resumes and LinkedIn.",
       size: "wide",
+      href: "/signup",
+      cta: "Claim your profile",
     },
     {
       title: "Contest tracking",
       description: "Upcoming and past contest performance, synced from LeetCode.",
       size: "sm",
+      href: "/signup",
+      cta: "Get started",
     },
   ],
 } as const;
@@ -140,9 +152,9 @@ export const clubCta = {
 export const statsBand = {
   disclaimer: "Illustrative data — LeetRank is in early access.",
   stats: [
-    { value: "12,400+", label: "problems solved this week" },
-    { value: "340+", label: "universities represented" },
-    { value: "8,900+", label: "verified student profiles" },
+    { value: 12400, suffix: "+", label: "problems solved this week" },
+    { value: 340, suffix: "+", label: "universities represented" },
+    { value: 8900, suffix: "+", label: "verified student profiles" },
   ],
 } as const;
 

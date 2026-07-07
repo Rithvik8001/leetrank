@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Wordmark } from "@/components/wordmark";
+import { MotionButton } from "@/components/marketing/motion/motion-button";
 import { nav } from "@/lib/marketing/content";
 
 export function MobileNav() {
@@ -44,12 +45,12 @@ export function MobileNav() {
           ))}
         </nav>
         <div className="mt-auto flex flex-col gap-2 p-4">
-          <Button
+          <MotionButton
             nativeButton={false}
             render={<Link href={nav.cta.href} onClick={() => setOpen(false)} />}
           >
             {nav.cta.label}
-          </Button>
+          </MotionButton>
         </div>
       </SheetContent>
     </Sheet>

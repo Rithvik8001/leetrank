@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { StaggerGroup, StaggerItem } from "@/components/marketing/motion/reveal";
 import {
   heroLeaderboard,
   type RatingDelta,
@@ -55,42 +56,45 @@ export function HeroLeaderboardPreview() {
           Live
         </Badge>
       </CardHeader>
-      <CardContent className="flex flex-col gap-1">
-        {heroLeaderboard.map((entry) => (
-          <div
-            key={entry.handle}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-2 py-2 transition-colors",
-              entry.rank === 1 && "bg-rank-gold/10 ring-1 ring-rank-gold/30",
-            )}
-          >
-            <span
+      <CardContent>
+        <StaggerGroup className="flex flex-col gap-1">
+          {heroLeaderboard.map((entry) => (
+            <StaggerItem
+              key={entry.handle}
               className={cn(
-                "w-5 shrink-0 font-mono text-sm font-semibold",
-                entry.rank === 1 ? "text-rank-gold" : "text-muted-foreground",
+                "flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50",
+                entry.rank === 1 &&
+                  "bg-rank-gold/10 ring-1 ring-rank-gold/30 hover:bg-rank-gold/15",
               )}
             >
-              {entry.rank}
-            </span>
-            <Avatar size="sm">
-              <AvatarFallback>{initials(entry.studentName)}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground">
-                {entry.studentName}
-              </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {entry.university}
-              </p>
-            </div>
-            <span className="shrink-0 font-mono text-sm text-foreground">
-              {entry.problemsSolved}
-            </span>
-            <div className="w-14 shrink-0 text-right">
-              <RatingDeltaChip delta={entry.ratingDelta} />
-            </div>
-          </div>
-        ))}
+              <span
+                className={cn(
+                  "w-5 shrink-0 font-mono text-sm font-semibold",
+                  entry.rank === 1 ? "text-rank-gold" : "text-muted-foreground",
+                )}
+              >
+                {entry.rank}
+              </span>
+              <Avatar size="sm">
+                <AvatarFallback>{initials(entry.studentName)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {entry.studentName}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {entry.university}
+                </p>
+              </div>
+              <span className="shrink-0 font-mono text-sm text-foreground">
+                {entry.problemsSolved}
+              </span>
+              <div className="w-14 shrink-0 text-right">
+                <RatingDeltaChip delta={entry.ratingDelta} />
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerGroup>
       </CardContent>
     </Card>
   );

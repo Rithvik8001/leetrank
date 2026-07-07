@@ -5,12 +5,13 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { FadeIn } from "@/components/marketing/motion/reveal";
 import { faq } from "@/lib/marketing/content";
 
 export function Faq() {
   return (
     <section id="faq" className="border-b border-border px-6 py-20">
-      <div className="mx-auto max-w-3xl">
+      <FadeIn className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">
           <Badge variant="secondary" className="mb-4 font-mono">
             {faq.eyebrow}
@@ -30,7 +31,7 @@ export function Faq() {
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
+      </FadeIn>
     </section>
   );
 }
