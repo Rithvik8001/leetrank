@@ -6,10 +6,10 @@ export function StatsBand() {
   return (
     <section className="border-b border-border bg-muted/30">
       <div className="px-6 py-16">
-        <StaggerGroup className="grid gap-8 sm:grid-cols-3">
+        <StaggerGroup className="grid gap-8 sm:grid-cols-3 sm:divide-x sm:divide-border">
           {statsBand.stats.map((stat) => (
             <StaggerItem key={stat.label} className="text-center">
-              <p className="font-mono text-4xl font-semibold text-foreground sm:text-5xl">
+              <p className="font-mono text-5xl font-bold tracking-tight text-foreground tabular-nums sm:text-6xl">
                 <CountUp value={stat.value} />
                 {stat.suffix}
               </p>

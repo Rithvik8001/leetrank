@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconSvgElement } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import {
   RankingIcon,
   Analytics01Icon,
@@ -10,12 +12,11 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
+import { SectionLabel } from "@/components/marketing/section-label";
 import { FadeIn, StaggerGroup, StaggerItem } from "@/components/marketing/motion/reveal";
 import { featureGrid } from "@/lib/marketing/content";
 
-const icons = [
+const icons: IconSvgElement[] = [
   RankingIcon,
   Analytics01Icon,
   GitCompareIcon,
@@ -24,51 +25,57 @@ const icons = [
   Award01Icon,
 ];
 
-const sizeClasses: Record<string, string> = {
-  wide: "lg:col-span-2",
-  tall: "lg:col-span-1 lg:row-span-2",
-  sm: "lg:col-span-1",
-};
-
-function makeIcon(icon: IconSvgElement) {
-  return function FeatureIcon({ className }: { className?: string }) {
-    return <HugeiconsIcon icon={icon} className={className} strokeWidth={2} />;
-  };
-}
-
 export function FeatureGrid() {
   return (
     <section id="features" className="border-b border-border px-6 py-20">
       <FadeIn className="mx-auto mb-12 max-w-2xl text-center">
-        <Badge variant="secondary" className="mb-4 font-mono">
+        <SectionLabel align="center" className="mb-4">
           {featureGrid.eyebrow}
-        </Badge>
+        </SectionLabel>
         <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {featureGrid.heading}
         </h2>
       </FadeIn>
 
-      <StaggerGroup>
-        <BentoGrid className="auto-rows-[16rem]">
-          {featureGrid.features.map((feature, i) => (
+      <StaggerGroup className="grid overflow-hidden rounded-2xl border border-border sm:grid-cols-2">
+        {featureGrid.features.map((feature, i) => {
+          const isLastInRow = i % 2 === 1;
+          const isLastRow = i >= featureGrid.features.length - 2;
+
+          return (
             <StaggerItem
               key={feature.title}
-              className={cn("col-span-3", sizeClasses[feature.size])}
+              className={cn(
+                "group flex flex-col gap-3 border-border p-8",
+                !isLastInRow && "sm:border-r",
+                !isLastRow && "border-b",
+              )}
             >
-              <BentoCard
-                name={feature.title}
-                description={feature.description}
-                href={feature.href}
-                cta={feature.cta}
-                Icon={makeIcon(icons[i])}
-                className="h-full"
-                background={
-                  <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-primary/10 blur-2xl transition-transform duration-300 group-hover:scale-110" />
-                }
+              <HugeiconsIcon
+                icon={icons[i]}
+                className="size-6 text-primary"
+                strokeWidth={2}
               />
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                {feature.title}
+              </h3>
+              <p className="max-w-md text-sm text-muted-foreground">
+                {feature.description}
+              </p>
+              <Link
+                href={feature.href}
+                className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary transition-[gap] group-hover:gap-2"
+              >
+                {feature.cta}
+                <HugeiconsIcon
+                  icon={ArrowRight01Icon}
+                  className="size-4"
+                  strokeWidth={2}
+                />
+              </Link>
             </StaggerItem>
-          ))}
-        </BentoGrid>
+          );
+        })}
       </StaggerGroup>
     </section>
   );

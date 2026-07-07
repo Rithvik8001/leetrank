@@ -2,7 +2,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon } from "@hugeicons/core-free-icons";
 
-import { Badge } from "@/components/ui/badge";
+import { SectionLabel } from "@/components/marketing/section-label";
 import { MotionButton } from "@/components/marketing/motion/motion-button";
 import { FadeIn } from "@/components/marketing/motion/reveal";
 import { clubCta } from "@/lib/marketing/content";
@@ -14,9 +14,7 @@ export function ClubCta() {
         <div className="flex max-w-xl flex-col gap-3">
           <div className="flex items-center gap-2">
             <HugeiconsIcon icon={UserGroupIcon} className="size-5 text-primary" strokeWidth={2} />
-            <Badge variant="secondary" className="font-mono">
-              {clubCta.eyebrow}
-            </Badge>
+            <SectionLabel>{clubCta.eyebrow}</SectionLabel>
           </div>
           <h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             {clubCta.heading}

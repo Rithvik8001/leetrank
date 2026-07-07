@@ -61,6 +61,26 @@ export const heroLeaderboard: LeaderboardEntry[] = [
   },
 ];
 
+export type RankMovement = {
+  rank: number;
+  handle: string;
+  university: string;
+  ratingDelta: RatingDelta;
+};
+
+export const rankMovements: RankMovement[] = [
+  { rank: 1, handle: "avachen", university: "Northbridge Tech", ratingDelta: { value: 37, direction: "up" } },
+  { rank: 14, handle: "d_okafor", university: "Fairview University", ratingDelta: { value: 22, direction: "up" } },
+  { rank: 8, handle: "priyan", university: "Cascade Institute of Technology", ratingDelta: { value: 4, direction: "down" } },
+  { rank: 42, handle: "yliu99", university: "Lakeshore Polytechnic", ratingDelta: { value: 61, direction: "up" } },
+  { rank: 3, handle: "mreyes", university: "Riverside State", ratingDelta: { value: 12, direction: "up" } },
+  { rank: 27, handle: "hsong", university: "Northbridge Tech", ratingDelta: { value: 9, direction: "down" } },
+  { rank: 5, handle: "jkessler", university: "Fairview University", ratingDelta: { value: 0, direction: "flat" } },
+  { rank: 19, handle: "a_petrova", university: "Riverside State", ratingDelta: { value: 33, direction: "up" } },
+  { rank: 61, handle: "tomori_k", university: "Cascade Institute of Technology", ratingDelta: { value: 18, direction: "up" } },
+  { rank: 11, handle: "smarin", university: "Lakeshore Polytechnic", ratingDelta: { value: 21, direction: "up" } },
+];
+
 export type SubmissionDay = {
   date: string;
   count: number;

@@ -9,7 +9,7 @@ export function FinalCta() {
     <section className="border-b border-primary-foreground/15 bg-primary text-primary-foreground">
       <StaggerGroup className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-20 text-center">
         <StaggerItem>
-          <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
             {finalCta.heading}
           </h2>
         </StaggerItem>

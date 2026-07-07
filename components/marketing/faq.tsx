@@ -1,10 +1,10 @@
-import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { SectionLabel } from "@/components/marketing/section-label";
 import { FadeIn } from "@/components/marketing/motion/reveal";
 import { faq } from "@/lib/marketing/content";
 
@@ -13,9 +13,9 @@ export function Faq() {
     <section id="faq" className="border-b border-border px-6 py-20">
       <FadeIn className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">
-          <Badge variant="secondary" className="mb-4 font-mono">
+          <SectionLabel align="center" className="mb-4">
             {faq.eyebrow}
-          </Badge>
+          </SectionLabel>
           <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             {faq.heading}
           </h2>

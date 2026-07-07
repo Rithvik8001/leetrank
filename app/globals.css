@@ -41,6 +41,10 @@
   --color-card: var(--card);
   --color-rank-gold: var(--rank-gold);
   --color-rank-gold-foreground: var(--rank-gold-foreground);
+  --color-rank-silver: var(--rank-silver);
+  --color-rank-silver-foreground: var(--rank-silver-foreground);
+  --color-rank-bronze: var(--rank-bronze);
+  --color-rank-bronze-foreground: var(--rank-bronze-foreground);
   --color-rank-up: var(--rank-up);
   --color-rank-down: var(--rank-down);
   --radius-sm: calc(var(--radius) * 0.6);
@@ -53,78 +57,86 @@
 }
 
 :root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.496 0.265 301.924);
-  --primary-foreground: oklch(0.977 0.014 308.299);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --card: oklch(1 0.002 85);
+  --card-foreground: oklch(0.16 0.012 285);
+  --popover: oklch(1 0.002 85);
+  --popover-foreground: oklch(0.16 0.012 285);
+  --primary: oklch(0.4 0.185 296);
+  --primary-foreground: oklch(0.98 0.012 296);
+  --secondary: oklch(0.96 0.006 290);
+  --secondary-foreground: oklch(0.21 0.012 290);
+  --muted: oklch(0.965 0.004 85);
+  --muted-foreground: oklch(0.5 0.012 285);
+  --accent: oklch(0.96 0.006 290);
+  --accent-foreground: oklch(0.205 0.012 290);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.9 0.006 85);
+  --input: oklch(0.9 0.006 85);
+  --ring: oklch(0.62 0.05 296);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.558 0.288 302.321);
-  --sidebar-primary-foreground: oklch(0.977 0.014 308.299);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --rank-gold: oklch(0.795 0.161 82.29);
-  --rank-gold-foreground: oklch(0.145 0.02 82);
-  --rank-up: oklch(0.63 0.17 145);
-  --rank-down: oklch(0.577 0.245 27.325);
+  --sidebar: oklch(0.98 0.004 85);
+  --sidebar-foreground: oklch(0.16 0.012 285);
+  --sidebar-primary: oklch(0.4 0.185 296);
+  --sidebar-primary-foreground: oklch(0.98 0.012 296);
+  --sidebar-accent: oklch(0.96 0.006 290);
+  --sidebar-accent-foreground: oklch(0.205 0.012 290);
+  --sidebar-border: oklch(0.9 0.006 85);
+  --sidebar-ring: oklch(0.62 0.05 296);
+  --background: oklch(0.99 0.004 85);
+  --foreground: oklch(0.16 0.012 285);
+  --rank-gold: oklch(0.78 0.14 80);
+  --rank-gold-foreground: oklch(0.16 0.02 80);
+  --rank-silver: oklch(0.75 0.008 270);
+  --rank-silver-foreground: oklch(0.2 0.012 270);
+  --rank-bronze: oklch(0.62 0.09 45);
+  --rank-bronze-foreground: oklch(0.98 0.015 45);
+  --rank-up: oklch(0.6 0.16 145);
+  --rank-down: oklch(0.577 0.22 27.325);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.438 0.218 303.724);
-  --primary-foreground: oklch(0.977 0.014 308.299);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.16 0.012 292);
+  --foreground: oklch(0.97 0.006 90);
+  --card: oklch(0.2 0.014 292);
+  --card-foreground: oklch(0.97 0.006 90);
+  --popover: oklch(0.2 0.014 292);
+  --popover-foreground: oklch(0.97 0.006 90);
+  --primary: oklch(0.55 0.19 298);
+  --primary-foreground: oklch(0.98 0.012 298);
+  --secondary: oklch(0.28 0.016 292);
+  --secondary-foreground: oklch(0.97 0.006 90);
+  --muted: oklch(0.25 0.014 292);
+  --muted-foreground: oklch(0.68 0.014 285);
+  --accent: oklch(0.28 0.016 292);
+  --accent-foreground: oklch(0.97 0.006 90);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.58 0.06 298);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.627 0.265 303.9);
-  --sidebar-primary-foreground: oklch(0.977 0.014 308.299);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.19 0.014 292);
+  --sidebar-foreground: oklch(0.97 0.006 90);
+  --sidebar-primary: oklch(0.55 0.19 298);
+  --sidebar-primary-foreground: oklch(0.98 0.012 298);
+  --sidebar-accent: oklch(0.28 0.016 292);
+  --sidebar-accent-foreground: oklch(0.97 0.006 90);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --rank-gold: oklch(0.82 0.15 85);
-  --rank-gold-foreground: oklch(0.145 0 0);
+  --sidebar-ring: oklch(0.58 0.06 298);
+  --rank-gold: oklch(0.8 0.14 82);
+  --rank-gold-foreground: oklch(0.16 0 0);
+  --rank-silver: oklch(0.8 0.008 270);
+  --rank-silver-foreground: oklch(0.16 0 0);
+  --rank-bronze: oklch(0.68 0.1 45);
+  --rank-bronze-foreground: oklch(0.16 0.01 45);
   --rank-up: oklch(0.72 0.16 145);
   --rank-down: oklch(0.704 0.191 22.216);
 }
@@ -148,4 +160,27 @@
     transparent 1px
   );
   background-size: 22px 22px;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 34s linear infinite;
+}
+
+.group:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
 }

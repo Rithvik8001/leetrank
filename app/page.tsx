@@ -13,7 +13,7 @@ import { Footer } from "@/components/marketing/footer";
 
 export default function Home() {
   return (
-    <div className="relative mx-auto flex w-full max-w-5xl flex-1 flex-col border-x border-border">
+    <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col border-x border-border">
       <Nav />
       <main className="flex-1">
         <Hero />
