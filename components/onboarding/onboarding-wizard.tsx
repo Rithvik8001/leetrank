@@ -135,8 +135,8 @@ export function OnboardingWizard({
           {STEP_ORDER.map((s, index) => (
             <span
               key={s}
-              className={`h-1.5 w-6 rounded-full ${
-                index <= stepIndex ? "bg-primary" : "bg-muted"
+              className={`h-1 w-7 rounded-full transition-colors ${
+                index <= stepIndex ? "bg-gold" : "bg-border"
               }`}
             />
           ))}

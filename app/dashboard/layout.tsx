@@ -25,14 +25,14 @@ export default async function DashboardLayout({
 
   return (
     <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col border-x border-border">
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur-2xl">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/70 px-6 backdrop-blur-xl">
         <Link href="/" aria-label="LeetRank home">
           <Wordmark />
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           <Link
             href="/universities"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Universities
           </Link>

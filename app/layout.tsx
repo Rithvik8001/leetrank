@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter, Noto_Serif } from "next/font/google";
+import { Archivo, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
-const notoSerifHeading = Noto_Serif({
+const archivoHeading = Archivo({
   subsets: ["latin"],
   variable: "--font-heading",
+  weight: ["500", "600", "700", "800"],
 });
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -55,7 +56,7 @@ export default function RootLayout({
         geistMono.variable,
         "font-sans",
         inter.variable,
-        notoSerifHeading.variable,
+        archivoHeading.variable,
       )}
     >
       <body className="min-h-full flex flex-col">

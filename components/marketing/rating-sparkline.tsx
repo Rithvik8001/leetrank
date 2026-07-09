@@ -28,7 +28,7 @@ export function RatingSparkline({ points }: { points: { rating: number }[] }) {
       <motion.path
         d={path}
         fill="none"
-        stroke="var(--color-primary)"
+        stroke="var(--color-foreground)"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

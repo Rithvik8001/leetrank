@@ -10,13 +10,11 @@ import { faq } from "@/lib/marketing/content";
 
 export function Faq() {
   return (
-    <section id="faq" className="border-b border-border px-6 py-20">
-      <FadeIn className="mx-auto max-w-3xl">
-        <div className="mb-10 text-center">
-          <SectionLabel align="center" className="mb-4">
-            {faq.eyebrow}
-          </SectionLabel>
-          <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+    <section id="faq" className="border-b border-border px-6 py-24">
+      <FadeIn className="mx-auto grid max-w-4xl gap-10 md:grid-cols-[0.7fr_1fr]">
+        <div>
+          <SectionLabel className="mb-5">{faq.eyebrow}</SectionLabel>
+          <h2 className="font-heading text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
             {faq.heading}
           </h2>
         </div>

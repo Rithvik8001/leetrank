@@ -8,25 +8,25 @@ import { nav } from "@/lib/marketing/content";
 
 export function Nav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-xl">
       <div className="flex h-16 items-center justify-between px-6">
         <Link href="/" aria-label="LeetRank home">
           <Wordmark />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-9 md:flex">
           {nav.links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle />
           <MotionButton nativeButton={false} render={<Link href={nav.cta.href} />}>
             {nav.cta.label}

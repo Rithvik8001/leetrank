@@ -8,14 +8,15 @@ export default async function UniversitiesPage() {
   const universities = await getAllUniversities();
 
   return (
-    <div className="flex flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-8 px-6 py-12">
+      <div className="flex flex-col gap-4">
         <SectionLabel>Directory</SectionLabel>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
-          Universities
+        <h1 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-balance text-foreground sm:text-5xl">
+          Find your university
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Find your school and see how it stacks up.
+        <p className="max-w-xl text-muted-foreground">
+          Search {universities.length} schools and see how each one&apos;s CP
+          community stacks up.
         </p>
       </div>
 

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconSvgElement } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import {
+  ArrowRight01Icon,
   RankingIcon,
   Analytics01Icon,
   GitCompareIcon,
@@ -11,9 +11,12 @@ import {
   Award01Icon,
 } from "@hugeicons/core-free-icons";
 
-import { cn } from "@/lib/utils";
 import { SectionLabel } from "@/components/marketing/section-label";
-import { FadeIn, StaggerGroup, StaggerItem } from "@/components/marketing/motion/reveal";
+import {
+  FadeIn,
+  StaggerGroup,
+  StaggerItem,
+} from "@/components/marketing/motion/reveal";
 import { featureGrid } from "@/lib/marketing/content";
 
 const icons: IconSvgElement[] = [
@@ -27,49 +30,40 @@ const icons: IconSvgElement[] = [
 
 export function FeatureGrid() {
   return (
-    <section id="features" className="border-b border-border px-6 py-20">
-      <FadeIn className="mx-auto mb-12 max-w-2xl text-center">
-        <SectionLabel align="center" className="mb-4">
-          {featureGrid.eyebrow}
-        </SectionLabel>
-        <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+    <section id="features" className="border-b border-border px-6 py-24">
+      <FadeIn className="mb-12 max-w-2xl">
+        <SectionLabel className="mb-5">{featureGrid.eyebrow}</SectionLabel>
+        <h2 className="font-heading text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
           {featureGrid.heading}
         </h2>
       </FadeIn>
 
-      <StaggerGroup className="grid overflow-hidden rounded-2xl border border-border sm:grid-cols-2">
+      <StaggerGroup className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         {featureGrid.features.map((feature, i) => {
-          const isLastInRow = i % 2 === 1;
-          const isLastRow = i >= featureGrid.features.length - 2;
-
           return (
             <StaggerItem
               key={feature.title}
-              className={cn(
-                "group flex flex-col gap-3 border-border p-8",
-                !isLastInRow && "sm:border-r",
-                !isLastRow && "border-b",
-              )}
+              className="group flex flex-col gap-3.5 bg-background p-7"
             >
               <HugeiconsIcon
                 icon={icons[i]}
-                className="size-6 text-primary"
-                strokeWidth={2}
+                className="size-5 text-muted-foreground"
+                strokeWidth={1.75}
               />
-              <h3 className="font-heading text-lg font-semibold text-foreground">
+              <h3 className="font-heading text-base font-semibold tracking-tight text-foreground">
                 {feature.title}
               </h3>
-              <p className="max-w-md text-sm text-muted-foreground">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {feature.description}
               </p>
               <Link
                 href={feature.href}
-                className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary transition-[gap] group-hover:gap-2"
+                className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-medium text-foreground"
               >
                 {feature.cta}
                 <HugeiconsIcon
                   icon={ArrowRight01Icon}
-                  className="size-4"
+                  className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5"
                   strokeWidth={2}
                 />
               </Link>

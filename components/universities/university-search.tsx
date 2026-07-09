@@ -10,7 +10,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Badge } from "@/components/ui/badge";
 import {
   Empty,
   EmptyHeader,
@@ -52,20 +51,25 @@ export function UniversitySearch({
   }, [universities, query]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <InputGroup className="max-w-sm">
-        <InputGroupAddon>
-          <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
-        </InputGroupAddon>
-        <InputGroupInput
-          placeholder="Search by name, city, or state"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-      </InputGroup>
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center justify-between gap-4">
+        <InputGroup className="max-w-sm">
+          <InputGroupAddon>
+            <HugeiconsIcon icon={Search01Icon} strokeWidth={2} />
+          </InputGroupAddon>
+          <InputGroupInput
+            placeholder="Search by name, city, or state"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </InputGroup>
+        <span className="hidden font-mono text-[0.68rem] tracking-[0.14em] text-muted-foreground/70 uppercase tabular-nums sm:inline">
+          {filtered.length} results
+        </span>
+      </div>
 
       {filtered.length === 0 ? (
-        <Empty>
+        <Empty className="rounded-md border border-border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <HugeiconsIcon icon={GraduationCapIcon} strokeWidth={2} />
@@ -77,26 +81,26 @@ export function UniversitySearch({
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="divide-y divide-border rounded-lg border border-border">
+        <div className="divide-y divide-border overflow-hidden rounded-md border border-border">
           {filtered.map((university) => (
             <Link
               key={university.slug}
               href={`/universities/${university.slug}`}
-              className="flex items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-muted/50"
+              className="group flex items-center justify-between gap-4 px-4 py-3.5 transition-colors hover:bg-muted/50 sm:px-5"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">
                   {university.name}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="truncate font-mono text-xs text-muted-foreground">
                   {university.city}, {university.state}
                 </p>
               </div>
               {university.ownershipType ? (
-                <Badge variant="secondary" className="shrink-0">
+                <span className="shrink-0 font-mono text-[0.62rem] tracking-[0.14em] text-muted-foreground/70 uppercase">
                   {OWNERSHIP_LABEL[university.ownershipType] ??
                     university.ownershipType}
-                </Badge>
+                </span>
               ) : null}
             </Link>
           ))}

@@ -1,20 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Globe02Icon } from "@hugeicons/core-free-icons";
+import { Globe02Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 import { prisma } from "@/lib/prisma";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Empty,
   EmptyHeader,
@@ -22,27 +11,18 @@ import {
   EmptyDescription,
 } from "@/components/ui/empty";
 import { SectionLabel } from "@/components/marketing/section-label";
+import {
+  Ledger,
+  LedgerRow,
+  RankNumber,
+  LiveTag,
+} from "@/components/standings";
 
 const OWNERSHIP_LABEL: Record<string, string> = {
   PUBLIC: "Public",
   PRIVATE_NONPROFIT: "Private nonprofit",
   PRIVATE_FOR_PROFIT: "Private for-profit",
 };
-
-const podiumTextStyles: Record<number, string> = {
-  1: "text-rank-gold",
-  2: "text-rank-silver",
-  3: "text-rank-bronze",
-};
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 export default async function UniversityProfilePage({
   params,
@@ -62,7 +42,6 @@ export default async function UniversityProfilePage({
     select: {
       id: true,
       name: true,
-      image: true,
       leetcodeUsername: true,
       leetcodeTotalSolved: true,
       leetcodeRanking: true,
@@ -70,43 +49,57 @@ export default async function UniversityProfilePage({
   });
 
   return (
-    <div className="flex flex-col gap-8 px-6 py-10">
-      <div className="flex flex-col gap-3">
-        <SectionLabel>University profile</SectionLabel>
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
-            {university.name}
-          </h1>
+    <div className="flex flex-col gap-10 px-6 py-12">
+      <Link
+        href="/universities"
+        className="inline-flex w-fit items-center gap-1.5 font-mono text-[0.7rem] tracking-[0.16em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+      >
+        <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} className="size-3.5" />
+        All universities
+      </Link>
+
+      <header className="flex flex-col gap-4">
+        <SectionLabel>University standings</SectionLabel>
+        <h1 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-balance text-foreground sm:text-5xl">
+          {university.name}
+        </h1>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-xs tracking-[0.06em] text-muted-foreground">
+          <span>
+            {university.city}, {university.state}
+          </span>
           {university.ownershipType ? (
-            <Badge variant="secondary">
-              {OWNERSHIP_LABEL[university.ownershipType] ??
-                university.ownershipType}
-            </Badge>
+            <>
+              <span aria-hidden="true" className="text-muted-foreground/40">
+                ·
+              </span>
+              <span>
+                {OWNERSHIP_LABEL[university.ownershipType] ??
+                  university.ownershipType}
+              </span>
+            </>
+          ) : null}
+          {university.website ? (
+            <>
+              <span aria-hidden="true" className="text-muted-foreground/40">
+                ·
+              </span>
+              <a
+                href={university.website}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-foreground underline decoration-gold decoration-2 underline-offset-4"
+              >
+                <HugeiconsIcon icon={Globe02Icon} strokeWidth={2} className="size-3.5" />
+                {university.website.replace(/^https?:\/\//, "")}
+              </a>
+            </>
           ) : null}
         </div>
-        <p className="text-sm text-muted-foreground">
-          {university.city}, {university.state}
-        </p>
-        {university.website ? (
-          <a
-            href={university.website}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex w-fit items-center gap-1.5 text-sm text-primary underline-offset-2 hover:underline"
-          >
-            <HugeiconsIcon icon={Globe02Icon} strokeWidth={2} className="size-4" />
-            {university.website.replace(/^https?:\/\//, "")}
-          </a>
-        ) : null}
-      </div>
+      </header>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="font-heading text-xl font-semibold tracking-tight text-foreground">
-          Leaderboard
-        </h2>
-
+      <section className="flex flex-col gap-4">
         {leaderboard.length === 0 ? (
-          <Empty>
+          <Empty className="rounded-md border border-border">
             <EmptyHeader>
               <EmptyTitle>No ranked students yet</EmptyTitle>
               <EmptyDescription>
@@ -116,69 +109,56 @@ export default async function UniversityProfilePage({
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="rounded-lg border border-border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">Rank</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead className="text-right">Solved</TableHead>
-                  <TableHead className="text-right">Global rank</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {leaderboard.map((student, index) => {
-                  const rank = index + 1;
-                  return (
-                    <TableRow key={student.id}>
-                      <TableCell>
-                        <span
-                          className={cn(
-                            "font-mono text-base font-bold tabular-nums",
-                            podiumTextStyles[rank] ?? "text-muted-foreground",
-                          )}
-                        >
-                          {rank}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar size="sm">
-                            <AvatarFallback>
-                              {initials(student.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-foreground">
-                              {student.name}
-                            </p>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {student.leetcodeUsername}
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-mono tabular-nums">
-                        {student.leetcodeTotalSolved ?? 0}
-                      </TableCell>
-                      <TableCell className="text-right font-mono tabular-nums text-muted-foreground">
-                        {student.leetcodeRanking ?? "—"}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </div>
+          <Ledger>
+            {/* Sheet header */}
+            <div className="flex items-center justify-between bg-muted/40 px-4 py-3 sm:px-5">
+              <span className="font-mono text-[0.68rem] font-medium tracking-[0.16em] text-foreground uppercase">
+                Leaderboard
+              </span>
+              <LiveTag>
+                {leaderboard.length} verified
+              </LiveTag>
+            </div>
 
-      <Link
-        href="/universities"
-        className="w-fit text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-      >
-        ← Back to all universities
-      </Link>
+            {/* Column captions */}
+            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-x-4 px-4 py-2 font-mono text-[0.6rem] tracking-[0.14em] text-muted-foreground/70 uppercase sm:px-5">
+              <span className="w-7 text-right">#</span>
+              <span>Student</span>
+              <div className="flex items-center gap-6">
+                <span className="w-14 text-right">Solved</span>
+                <span className="w-16 text-right">Global</span>
+              </div>
+            </div>
+
+            {leaderboard.map((student, index) => {
+              const rank = index + 1;
+              return (
+                <LedgerRow key={student.id} leader={rank === 1}>
+                  <RankNumber rank={rank} />
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-foreground">
+                      {student.name}
+                    </div>
+                    <div className="truncate font-mono text-xs text-muted-foreground">
+                      {student.leetcodeUsername}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <span className="w-14 text-right font-mono text-sm text-foreground tabular-nums">
+                      {student.leetcodeTotalSolved ?? 0}
+                    </span>
+                    <span className="w-16 text-right font-mono text-sm text-muted-foreground tabular-nums">
+                      {student.leetcodeRanking != null
+                        ? `#${student.leetcodeRanking}`
+                        : "—"}
+                    </span>
+                  </div>
+                </LedgerRow>
+              );
+            })}
+          </Ledger>
+        )}
+      </section>
     </div>
   );
 }

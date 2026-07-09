@@ -3,10 +3,10 @@ import type { SubmissionDay } from "@/lib/marketing/placeholder-data";
 
 function intensityClass(count: number) {
   if (count === 0) return "bg-muted";
-  if (count <= 2) return "bg-primary/25";
-  if (count <= 4) return "bg-primary/50";
-  if (count <= 6) return "bg-primary/75";
-  return "bg-primary";
+  if (count <= 2) return "bg-gold/30";
+  if (count <= 4) return "bg-gold/55";
+  if (count <= 6) return "bg-gold/80";
+  return "bg-gold";
 }
 
 export function AnalyticsHeatmap({ days }: { days: SubmissionDay[] }) {

@@ -1,39 +1,36 @@
 import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 import { MotionButton } from "@/components/marketing/motion/motion-button";
 import { HeroLeaderboardPreview } from "@/components/marketing/hero-leaderboard-preview";
-import { FadeIn, StaggerGroup, StaggerItem } from "@/components/marketing/motion/reveal";
+import { LiveTag } from "@/components/standings";
+import {
+  FadeIn,
+  StaggerGroup,
+  StaggerItem,
+} from "@/components/marketing/motion/reveal";
 import { hero } from "@/lib/marketing/content";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border">
-      <div
-        aria-hidden="true"
-        className="bg-dotted pointer-events-none absolute inset-0 mask-[radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)] opacity-60"
-      />
-      <div className="relative flex flex-col gap-12 px-6 pt-16 pb-20 lg:flex-row lg:items-center lg:gap-8 lg:pt-28 lg:pb-32">
-        <StaggerGroup className="flex flex-col items-start gap-7 lg:w-1/2">
+      <div className="relative grid gap-14 px-6 pt-20 pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:pt-28 lg:pb-32">
+        <StaggerGroup className="flex flex-col items-start gap-7">
           <StaggerItem>
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 py-1 pr-3 pl-1.5 font-mono text-xs font-medium text-foreground">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rank-up opacity-75" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-rank-up" />
-              </span>
-              {hero.eyebrow}
-            </div>
+            <LiveTag>{hero.eyebrow}</LiveTag>
           </StaggerItem>
           <StaggerItem>
-            <h1 className="font-heading text-5xl leading-[1.02] font-semibold tracking-[-0.02em] text-balance text-foreground sm:text-6xl lg:text-[4.25rem]">
+            <h1 className="font-heading text-[2.75rem] leading-[0.98] font-extrabold tracking-[-0.03em] text-balance text-foreground sm:text-6xl lg:text-[4.5rem]">
               {hero.headline}
             </h1>
           </StaggerItem>
           <StaggerItem>
-            <p className="max-w-xl text-lg text-muted-foreground">
+            <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
               {hero.subhead}
             </p>
           </StaggerItem>
-          <StaggerItem className="flex flex-col gap-3 sm:flex-row">
+          <StaggerItem className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <MotionButton
               size="lg"
               nativeButton={false}
@@ -41,21 +38,21 @@ export function Hero() {
             >
               {hero.primaryCta.label}
             </MotionButton>
-            <MotionButton
-              size="lg"
-              variant="outline"
-              nativeButton={false}
-              render={<Link href={hero.secondaryCta.href} />}
+            <Link
+              href={hero.secondaryCta.href}
+              className="group inline-flex items-center gap-1.5 text-sm font-medium text-foreground underline-offset-4 hover:underline"
             >
               {hero.secondaryCta.label}
-            </MotionButton>
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2}
+              />
+            </Link>
           </StaggerItem>
         </StaggerGroup>
 
-        <FadeIn
-          delay={0.2}
-          className="flex justify-center lg:w-1/2 lg:justify-end"
-        >
+        <FadeIn delay={0.15} className="flex justify-center lg:justify-end">
           <HeroLeaderboardPreview />
         </FadeIn>
       </div>
