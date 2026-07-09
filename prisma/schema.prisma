@@ -20,8 +20,55 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  universityId          String?
+  university            University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  onboardingCompletedAt DateTime?
+
+  leetcodeUsername                  String?
+  leetcodeVerified                  Boolean   @default(false)
+  leetcodeVerifiedAt                DateTime?
+  leetcodeVerificationCode          String?
+  leetcodeVerificationCodeExpiresAt DateTime?
+
+  leetcodeTotalSolved  Int?
+  leetcodeEasySolved   Int?
+  leetcodeMediumSolved Int?
+  leetcodeHardSolved   Int?
+  leetcodeRanking      Int?
+  leetcodeLastSyncedAt DateTime?
+
   @@unique([email])
+  @@unique([leetcodeUsername])
+  @@index([universityId])
   @@map("user")
+}
+
+enum OwnershipType {
+  PUBLIC
+  PRIVATE_NONPROFIT
+  PRIVATE_FOR_PROFIT
+
+  @@map("ownership_type")
+}
+
+model University {
+  id            String         @id
+  unitId        String?
+  name          String
+  slug          String
+  city          String
+  state         String
+  website       String?
+  ownershipType OwnershipType?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  users         User[]
+
+  @@unique([slug])
+  @@unique([unitId])
+  @@index([state])
+  @@index([name])
+  @@map("university")
 }
 
 model Session {

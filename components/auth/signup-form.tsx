@@ -70,7 +70,7 @@ export function SignupForm() {
         onResponse: () => setIsPending(false),
         onSuccess: () => {
           toast.success("Account created. Welcome to LeetRank.");
-          router.push("/");
+          router.push("/onboarding");
           router.refresh();
         },
         onError: (ctx) => {

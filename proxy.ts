@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
+import { getSessionCookie, getCookieCache } from "better-auth/cookies";
 
 const publicRoutes = new Set(["/", "/login", "/signup"]);
 const authOnlyRoutes = new Set(["/login", "/signup"]);
+const onboardingExemptRoutes = new Set(["/onboarding"]);
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
 
@@ -15,6 +16,17 @@ export function proxy(request: NextRequest) {
 
   if (sessionCookie && authOnlyRoutes.has(pathname)) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (
+    sessionCookie &&
+    !publicRoutes.has(pathname) &&
+    !onboardingExemptRoutes.has(pathname)
+  ) {
+    const cache = await getCookieCache(request);
+    if (cache && !cache.user.onboardingCompletedAt) {
+      return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
   }
 
   return NextResponse.next();
