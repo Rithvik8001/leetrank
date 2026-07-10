@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CodeSquareIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowUpRight01Icon,
+  CodeSquareIcon,
+  InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { toast } from "sonner";
 
 import { leetcodeUsernameSchema } from "@/lib/onboarding/schemas";
@@ -60,6 +64,39 @@ export function StepLeetcodeUsername({
           />
         </InputGroup>
         {error ? <p className="text-xs text-destructive">{error}</p> : null}
+      </div>
+
+      <div className="overflow-hidden rounded-md border border-border bg-muted/20">
+        <div className="flex items-center gap-2 border-b border-border px-3 py-2 font-mono text-[0.65rem] font-medium tracking-[0.12em] text-foreground uppercase">
+          <HugeiconsIcon
+            icon={InformationCircleIcon}
+            strokeWidth={2}
+            className="size-3.5 text-gold"
+          />
+          Where to find your username
+        </div>
+        <div className="space-y-2.5 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
+          <p>
+            Open your public LeetCode profile and copy the text after{" "}
+            <span className="font-mono text-foreground">/u/</span> in the address bar.
+          </p>
+          <div className="rounded-sm border border-border bg-background px-2.5 py-2 font-mono text-[0.68rem] text-foreground">
+            leetcode.com/u/<span className="text-gold">your-username</span>/
+          </div>
+          <p>
+            Don&apos;t use the <strong className="font-medium text-foreground">Display Name</strong>{" "}
+            shown in Settings—it can be different.
+          </p>
+          <a
+            href="https://leetcode.com/profile/"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 font-medium text-foreground underline decoration-gold decoration-2 underline-offset-4"
+          >
+            Open my LeetCode profile
+            <HugeiconsIcon icon={ArrowUpRight01Icon} strokeWidth={2} className="size-3.5" />
+          </a>
+        </div>
       </div>
 
       <Button type="submit" size="lg" className="mt-2 w-full" disabled={isPending}>

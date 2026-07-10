@@ -29,7 +29,7 @@ const STEP_COPY: Record<Step, { eyebrow: string; heading: string; description: s
   "leetcode-username": {
     eyebrow: "Step 2 of 3",
     heading: "Link your LeetCode account",
-    description: "Enter your LeetCode username to generate a verification code.",
+    description: "Enter the username from your public LeetCode profile URL.",
   },
   verify: {
     eyebrow: "Step 3 of 3",
