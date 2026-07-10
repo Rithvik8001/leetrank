@@ -2,13 +2,16 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, CheckmarkCircle02Icon, UserMultipleIcon } from "@hugeicons/core-free-icons";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SectionLabel } from "@/components/marketing/section-label";
 import { LeetCodeStats } from "@/components/dashboard/leetcode-stats";
 import type { LeetCodeBadge } from "@/lib/leetcode";
+import { getUniversityRank, normalizePublicHandle, parseLeetCodeBadges } from "@/lib/users/profiles";
+import { PublicProfileControls } from "@/components/dashboard/public-profile-controls";
+import { Button } from "@/components/ui/button";
 
 function firstName(name: string) {
   return name.trim().split(" ")[0] || name;
@@ -30,9 +33,9 @@ export default async function DashboardPage() {
 
   const formatNumber = (value: number | null) =>
     value == null ? "—" : value.toLocaleString();
-  const badges = Array.isArray(user.leetcodeBadges)
-    ? (user.leetcodeBadges as unknown as LeetCodeBadge[])
-    : [];
+  const badges: LeetCodeBadge[] = parseLeetCodeBadges(user.leetcodeBadges);
+  const universityRank = await getUniversityRank(user.universityId, user.leetcodeTotalSolved);
+  const profileHandle = user.publicProfileHandle ?? normalizePublicHandle(user.leetcodeUsername ?? "");
   const stats = [
     { label: "Problems solved", value: formatNumber(user.leetcodeTotalSolved) },
     { label: "Easy", value: formatNumber(user.leetcodeEasySolved) },
@@ -60,16 +63,37 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-10 px-6 py-12">
-      <header className="flex flex-col gap-4">
-        <SectionLabel>Your dashboard</SectionLabel>
-        <h1 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-balance text-foreground sm:text-5xl">
-          Welcome back, {firstName(user.name)}.
-        </h1>
-        {user.university ? (
-          <p className="font-mono text-xs tracking-[0.06em] text-muted-foreground">
-            Ranked at {user.university.name}
-          </p>
-        ) : null}
+      <header className="overflow-hidden rounded-md border border-border bg-card">
+        <div className="flex flex-col gap-6 px-6 py-7 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-4">
+            <SectionLabel>Your dashboard</SectionLabel>
+            <div>
+              <h1 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-balance text-foreground sm:text-5xl">
+                Welcome back, {firstName(user.name)}.
+              </h1>
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 text-foreground">
+                  <HugeiconsIcon icon={CheckmarkCircle02Icon} strokeWidth={2} className="size-3.5 text-gold" />
+                  @{user.leetcodeUsername} verified
+                </span>
+                {user.university ? <span>{user.university.name}</span> : null}
+              </div>
+            </div>
+          </div>
+          <div className="shrink-0 sm:text-right">
+            <div className="font-mono text-[0.62rem] tracking-[0.16em] text-muted-foreground uppercase">Campus rank</div>
+            <div className="mt-1 font-mono text-5xl font-semibold tracking-tight text-foreground tabular-nums">
+              {universityRank == null ? "—" : `#${universityRank}`}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 border-t border-border bg-muted/20 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <PublicProfileControls enabled={user.publicProfileEnabled} handle={profileHandle} />
+          <Button variant="ghost" nativeButton={false} render={<Link href="/compare" />}>
+            <HugeiconsIcon icon={UserMultipleIcon} strokeWidth={2} />
+            Compare with a classmate
+          </Button>
+        </div>
       </header>
 
       {user.leetcodeUsername ? (

@@ -20,6 +20,7 @@ import {
   LeetCodeFetchError,
 } from "@/lib/leetcode";
 import { profileStatsData } from "@/lib/leetcode-sync";
+import { normalizePublicHandle } from "@/lib/users/profiles";
 import { LeetcodeSyncStatus } from "@prisma/client";
 
 type ActionResult<T = undefined> =
@@ -149,6 +150,8 @@ export async function verifyLeetcodeBio(): Promise<ActionResult> {
       leetcodeVerifiedAt: new Date(),
       leetcodeVerificationCode: null,
       leetcodeVerificationCodeExpiresAt: null,
+      leetcodeUsername: profile.username,
+      publicProfileHandle: normalizePublicHandle(profile.username),
       ...profileStatsData(profile),
       leetcodeSyncStatus: LeetcodeSyncStatus.SUCCESS,
       leetcodeSyncError: null,

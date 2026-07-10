@@ -43,8 +43,12 @@ model User {
   leetcodeLastSyncAttemptAt   DateTime?
   leetcodeLastSyncedAt DateTime?
 
+  publicProfileEnabled Boolean @default(false)
+  publicProfileHandle  String?
+
   @@unique([email])
   @@unique([leetcodeUsername])
+  @@unique([publicProfileHandle])
   @@index([universityId])
   @@map("user")
 }

@@ -6,11 +6,15 @@ const publicRoutes = new Set(["/", "/login", "/signup"]);
 const authOnlyRoutes = new Set(["/login", "/signup"]);
 const onboardingExemptRoutes = new Set(["/onboarding"]);
 
+function isPublicRoute(pathname: string) {
+  return publicRoutes.has(pathname) || pathname.startsWith("/users/");
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
 
-  if (!sessionCookie && !publicRoutes.has(pathname)) {
+  if (!sessionCookie && !isPublicRoute(pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -20,7 +24,7 @@ export async function proxy(request: NextRequest) {
 
   if (
     sessionCookie &&
-    !publicRoutes.has(pathname) &&
+    !isPublicRoute(pathname) &&
     !onboardingExemptRoutes.has(pathname)
   ) {
     const cache = await getCookieCache(request);
