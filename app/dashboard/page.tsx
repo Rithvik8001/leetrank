@@ -2,7 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, CheckmarkCircle02Icon, UserMultipleIcon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, CheckmarkCircle02Icon, UserGroupIcon, UserMultipleIcon } from "@hugeicons/core-free-icons";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -113,19 +113,36 @@ export default async function DashboardPage() {
         />
       ) : null}
 
-      {user.university ? (
-        <Link
-          href={`/universities/${user.university.slug}`}
-          className="group inline-flex w-fit items-center gap-2 text-sm font-medium text-foreground"
-        >
-          View your university&apos;s leaderboard
-          <HugeiconsIcon
-            icon={ArrowRight01Icon}
-            strokeWidth={2}
-            className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-          />
-        </Link>
-      ) : null}
+      <div className="flex flex-col gap-3">
+        {user.university ? (
+          <Link
+            href={`/universities/${user.university.slug}`}
+            className="group inline-flex w-fit items-center gap-2 text-sm font-medium text-foreground"
+          >
+            View your university&apos;s leaderboard
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              strokeWidth={2}
+              className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+            />
+          </Link>
+        ) : null}
+
+        {user.leetcodeVerified ? (
+          <Link
+            href="/groups"
+            className="group inline-flex w-fit items-center gap-2 text-sm font-medium text-foreground"
+          >
+            <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} className="size-4 text-muted-foreground" />
+            Compete with friends in a group
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              strokeWidth={2}
+              className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+            />
+          </Link>
+        ) : null}
+      </div>
     </div>
   );
 }

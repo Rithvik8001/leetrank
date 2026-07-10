@@ -36,6 +36,12 @@ export default async function DashboardLayout({
           >
             Universities
           </Link>
+          <Link
+            href="/groups"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Groups
+          </Link>
           <ThemeToggle />
         </div>
       </header>

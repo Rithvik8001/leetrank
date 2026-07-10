@@ -48,6 +48,9 @@ model User {
 
   leetcodeSnapshots LeetcodeSnapshot[]
 
+  ownedGroups      Group[]           @relation("GroupOwner")
+  groupMemberships GroupMembership[]
+
   @@unique([email])
   @@unique([leetcodeUsername])
   @@unique([publicProfileHandle])
@@ -110,6 +113,36 @@ model University {
   @@index([state])
   @@index([name])
   @@map("university")
+}
+
+model Group {
+  id          String   @id
+  name        String
+  ownerId     String
+  owner       User     @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  inviteToken String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships GroupMembership[]
+
+  @@unique([inviteToken])
+  @@index([ownerId])
+  @@map("group")
+}
+
+model GroupMembership {
+  id      String @id
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@map("group_membership")
 }
 
 model Session {

@@ -14,7 +14,8 @@ function isPublicRoute(pathname: string) {
     publicRoutes.has(pathname) ||
     pathname === "/compare" ||
     pathname.startsWith("/u/") ||
-    pathname.startsWith("/users/")
+    pathname.startsWith("/users/") ||
+    pathname.startsWith("/groups/join/")
   );
 }
 
