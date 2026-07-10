@@ -7,10 +7,13 @@ import { Award01Icon, CheckmarkCircle02Icon, Exchange01Icon, GraduationScrollIco
 
 import { comparisonUrl } from "@/lib/comparison";
 import { getPublicProfile, normalizePublicHandle } from "@/lib/users/profiles";
+import { getUserSnapshots } from "@/lib/users/snapshots";
+import { daysAgo } from "@/lib/users/progress";
 import { Wordmark } from "@/components/wordmark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SectionLabel } from "@/components/marketing/section-label";
 import { StatTile } from "@/components/standings";
+import { HistoryCharts } from "@/components/charts/history-charts";
 import { Button } from "@/components/ui/button";
 import { ShareActions } from "@/components/share-actions";
 
@@ -35,6 +38,13 @@ export default async function PublicProfilePage({ params }: Props) {
   const profile = await getPublicProfile(username);
   if (!profile?.leetcodeUsername) notFound();
   const handle = normalizePublicHandle(profile.leetcodeUsername);
+  const snapshots = await getUserSnapshots(profile.id, { since: daysAgo(new Date(), 90) });
+  const historyRows = snapshots.map((snapshot) => ({
+    capturedAt: snapshot.capturedAt.toISOString(),
+    totalSolved: snapshot.totalSolved,
+    hardSolved: snapshot.hardSolved,
+    contestRating: snapshot.contestRating,
+  }));
   const stats = [
     ["Problems solved", value(profile.leetcodeTotalSolved)], ["Easy", value(profile.leetcodeEasySolved)],
     ["Medium", value(profile.leetcodeMediumSolved)], ["Hard", value(profile.leetcodeHardSolved)],
@@ -68,6 +78,12 @@ export default async function PublicProfilePage({ params }: Props) {
         <section className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Latest LeetCode statistics">
           {stats.map(([label, stat]) => <StatTile key={label} label={label} value={stat} />)}
         </section>
+
+        {historyRows.length >= 2 ? (
+          <section aria-label="Progress history">
+            <HistoryCharts rows={historyRows} rangeLabel="last 90 days" />
+          </section>
+        ) : null}
 
         <section className="overflow-hidden rounded-md border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3"><span className="font-mono text-[0.68rem] font-medium tracking-[0.16em] uppercase">Earned badges</span><span className="font-mono text-xs text-muted-foreground">{profile.badges.length}</span></div>

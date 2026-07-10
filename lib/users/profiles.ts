@@ -42,6 +42,7 @@ export async function getUniversityRank(
 }
 
 export const verifiedProfileSelect = {
+  id: true,
   name: true,
   leetcodeUsername: true,
   leetcodeVerified: true,

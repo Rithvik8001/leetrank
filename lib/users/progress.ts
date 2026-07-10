@@ -11,7 +11,7 @@ import type { RatingDelta } from "@/lib/marketing/placeholder-data";
 
 export const WEEK_DAYS = 7;
 export const MONTH_DAYS = 30;
-export const CHART_DAYS = 30;
+export const CHART_DAYS = 90;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -69,7 +69,7 @@ export type PersonalProgress = {
   monthHard: ProgressMetric;
   ratingChange: RatingDelta | null; // over the month
   rank: { now: number | null; then: number | null; movement: number | null }; // week; movement > 0 = climbed
-  chart: { capturedAt: string; totalSolved: number }[]; // last 30 days
+  chart: { capturedAt: string; totalSolved: number; hardSolved: number; contestRating: number | null }[]; // last CHART_DAYS
   insight: string | null;
 };
 
@@ -157,6 +157,8 @@ export async function getPersonalProgress(
     chart: chartRows.map((point) => ({
       capturedAt: point.capturedAt.toISOString(),
       totalSolved: point.totalSolved,
+      hardSolved: point.hardSolved,
+      contestRating: point.contestRating,
     })),
     insight: buildInsight({
       weekSolved: weekSolved.value,

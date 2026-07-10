@@ -2,7 +2,7 @@ import type { RatingDelta } from "@/lib/marketing/placeholder-data";
 import type { PersonalProgress, ProgressMetric } from "@/lib/users/progress";
 import { SectionLabel } from "@/components/marketing/section-label";
 import { Delta, StatTile } from "@/components/standings";
-import { ProgressChart } from "@/components/dashboard/progress-chart";
+import { HistoryCharts } from "@/components/charts/history-charts";
 
 function signed(value: number | null): string {
   if (value == null) return "—";
@@ -56,16 +56,7 @@ export function PersonalProgress({ data }: { data: PersonalProgress }) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-border bg-card">
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
-          <span className="font-mono text-[0.68rem] font-medium tracking-[0.16em] text-foreground uppercase">
-            Problems solved · last 30 days
-          </span>
-        </div>
-        <div className="p-5">
-          <ProgressChart points={data.chart} />
-        </div>
-      </div>
+      <HistoryCharts rows={data.chart} rangeLabel="last 90 days" />
     </section>
   );
 }
