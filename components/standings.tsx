@@ -111,10 +111,12 @@ export function StatCell({
 export function StatTile({
   label,
   value,
+  hint,
   className,
 }: {
   label: string;
   value: ReactNode;
+  hint?: ReactNode;
   className?: string;
 }) {
   return (
@@ -127,9 +129,16 @@ export function StatTile({
       <span className="font-mono text-[0.62rem] tracking-[0.16em] text-muted-foreground uppercase">
         {label}
       </span>
-      <span className="font-mono text-3xl font-semibold tracking-tight text-foreground tabular-nums">
-        {value}
-      </span>
+      <div>
+        <span className="font-mono text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+          {value}
+        </span>
+        {hint ? (
+          <div className="mt-1 font-mono text-[0.62rem] text-muted-foreground tabular-nums">
+            {hint}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

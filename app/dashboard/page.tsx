@@ -8,8 +8,10 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SectionLabel } from "@/components/marketing/section-label";
 import { LeetCodeStats } from "@/components/dashboard/leetcode-stats";
+import { PersonalProgress } from "@/components/dashboard/personal-progress";
 import type { LeetCodeBadge } from "@/lib/leetcode";
-import { getUniversityRank, normalizePublicHandle, parseLeetCodeBadges } from "@/lib/users/profiles";
+import { normalizePublicHandle, parseLeetCodeBadges } from "@/lib/users/profiles";
+import { getPersonalProgress } from "@/lib/users/progress";
 import { PublicProfileControls } from "@/components/dashboard/public-profile-controls";
 import { Button } from "@/components/ui/button";
 
@@ -34,7 +36,8 @@ export default async function DashboardPage() {
   const formatNumber = (value: number | null) =>
     value == null ? "—" : value.toLocaleString();
   const badges: LeetCodeBadge[] = parseLeetCodeBadges(user.leetcodeBadges);
-  const universityRank = await getUniversityRank(user.universityId, user.leetcodeTotalSolved);
+  const progress = await getPersonalProgress(user);
+  const universityRank = progress.rank.now;
   const profileHandle = user.publicProfileHandle ?? normalizePublicHandle(user.leetcodeUsername ?? "");
   const stats = [
     { label: "Problems solved", value: formatNumber(user.leetcodeTotalSolved) },
@@ -95,6 +98,8 @@ export default async function DashboardPage() {
           </Button>
         </div>
       </header>
+
+      {user.leetcodeVerified ? <PersonalProgress data={progress} /> : null}
 
       {user.leetcodeUsername ? (
         <LeetCodeStats
