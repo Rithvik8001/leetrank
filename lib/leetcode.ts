@@ -113,7 +113,8 @@ export function normalizeLeetCodeResponse(
     for (const badge of matchedUser.badges) {
       const item = record(badge);
       if (!item) continue;
-      const name = typeof item.displayName === "string" ? item.displayName : null;
+      const name =
+        typeof item.displayName === "string" ? item.displayName : null;
       if (!name) continue;
       badges.push({
         id: String(item.id ?? name),
@@ -158,12 +159,16 @@ export async function fetchLeetCodePublicProfile(
       cache: "no-store",
     });
   } catch {
-    throw new LeetCodeFetchError("We couldn't reach LeetCode. Try again shortly.");
+    throw new LeetCodeFetchError(
+      "We couldn't reach LeetCode. Try again shortly.",
+    );
   }
 
   if (response.status === 429) throw new LeetCodeRateLimitedError();
   if (!response.ok) {
-    throw new LeetCodeFetchError("LeetCode is unavailable right now. Try again shortly.");
+    throw new LeetCodeFetchError(
+      "LeetCode is unavailable right now. Try again shortly.",
+    );
   }
 
   let json: unknown;

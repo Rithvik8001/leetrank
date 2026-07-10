@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
-import { competitionRank, normalizePublicHandle, parseLeetCodeBadges } from "./profiles";
+import {
+  competitionRank,
+  normalizeProfileSearchQuery,
+  normalizePublicHandle,
+  parseLeetCodeBadges,
+  toProfileSuggestion,
+} from "./profiles";
 
 describe("public profiles", () => {
   test("normalizes verified handles for stable URLs", () => {
@@ -25,5 +31,35 @@ describe("competition ranking", () => {
 
   test("does not rank a missing solved snapshot", () => {
     expect(competitionRank(0, null)).toBeNull();
+  });
+});
+
+describe("profile suggestions", () => {
+  test("normalizes and caps search queries", () => {
+    expect(normalizeProfileSearchQuery("  Campus_Coder-7 ")).toBe("campus_coder-7");
+    expect(normalizeProfileSearchQuery("A".repeat(80))).toHaveLength(50);
+  });
+
+  test("projects only the public suggestion fields", () => {
+    expect(toProfileSuggestion({
+      name: "Ada Lovelace",
+      leetcodeUsername: "Ada_01",
+      publicProfileHandle: "ada_01",
+      university: { name: "Example University" },
+    })).toEqual({
+      handle: "ada_01",
+      leetcodeUsername: "Ada_01",
+      name: "Ada Lovelace",
+      universityName: "Example University",
+    });
+  });
+
+  test("rejects profiles without a canonical username and handle", () => {
+    expect(toProfileSuggestion({
+      name: "Unlinked",
+      leetcodeUsername: null,
+      publicProfileHandle: null,
+      university: null,
+    })).toBeNull();
   });
 });

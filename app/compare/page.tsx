@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { notFound } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckmarkCircle02Icon, Exchange01Icon } from "@hugeicons/core-free-icons";
+import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 
 import { auth } from "@/lib/auth";
 import {
@@ -11,11 +10,15 @@ import {
   difficultyInsights,
   DIFFICULTIES,
 } from "@/lib/comparison";
-import { getComparableProfile, normalizePublicHandle } from "@/lib/users/profiles";
+import {
+  getComparableProfile,
+  getComparableProfileForUser,
+  normalizePublicHandle,
+  toProfileSuggestion,
+} from "@/lib/users/profiles";
 import { SectionLabel } from "@/components/marketing/section-label";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ShareActions } from "@/components/share-actions";
+import { ProfileComparisonForm } from "@/components/compare/profile-comparison-form";
 
 function display(value: number | null, prefix = "") {
   return value == null ? "—" : `${prefix}${value.toLocaleString()}`;
@@ -49,18 +52,29 @@ export default async function ComparePage({
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
   const { left: rawLeft = "", right: rawRight = "" } = await searchParams;
-  const leftHandle = normalizePublicHandle(rawLeft);
+  const explicitLeft = Boolean(rawLeft.trim());
+  const explicitRight = Boolean(rawRight.trim());
+  const requestedLeftHandle = normalizePublicHandle(rawLeft);
   const rightHandle = normalizePublicHandle(rawRight);
-  const ready = Boolean(leftHandle && rightHandle);
   const publicOnly = !session;
 
-  const [left, right] = ready
-    ? await Promise.all([
-        getComparableProfile(leftHandle, publicOnly),
-        getComparableProfile(rightHandle, publicOnly),
-      ])
-    : [null, null];
-  if (ready && (!left || !right)) notFound();
+  const [left, right] = await Promise.all([
+    explicitLeft
+      ? getComparableProfile(requestedLeftHandle, publicOnly)
+      : session
+        ? getComparableProfileForUser(session.user.id)
+        : null,
+    explicitRight ? getComparableProfile(rightHandle, publicOnly) : null,
+  ]);
+  const leftHandle = left?.publicProfileHandle ?? requestedLeftHandle;
+  const ready = Boolean(left && right);
+  const invalidHandles = [
+    explicitLeft && !left ? rawLeft : null,
+    explicitRight && !right ? rawRight : null,
+  ].filter((handle): handle is string => Boolean(handle));
+  const comparisonError = invalidHandles.length
+    ? `We couldn't find ${invalidHandles.length === 1 ? `@${invalidHandles[0]}` : "one or both profiles"}. Search for a verified LeetRank username and select it from the results.`
+    : null;
 
   const leftDistribution = left ? difficultyDistribution({ total: left.leetcodeTotalSolved, easy: left.leetcodeEasySolved, medium: left.leetcodeMediumSolved, hard: left.leetcodeHardSolved }) : null;
   const rightDistribution = right ? difficultyDistribution({ total: right.leetcodeTotalSolved, easy: right.leetcodeEasySolved, medium: right.leetcodeMediumSolved, hard: right.leetcodeHardSolved }) : null;
@@ -85,11 +99,11 @@ export default async function ComparePage({
         <p className="max-w-xl text-muted-foreground">Compare the latest verified LeetCode snapshots. Public links work when both profiles are shared publicly.</p>
       </header>
 
-      <form action="/compare" method="get" className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-[1fr_1fr_auto]">
-        <label className="flex flex-col gap-2 bg-card p-4"><span className="font-mono text-[0.62rem] tracking-[0.14em] text-muted-foreground uppercase">Left username</span><Input name="left" defaultValue={leftHandle} placeholder="leetcode_username" required /></label>
-        <label className="flex flex-col gap-2 bg-card p-4"><span className="font-mono text-[0.62rem] tracking-[0.14em] text-muted-foreground uppercase">Right username</span><Input name="right" defaultValue={rightHandle} placeholder="another_username" required /></label>
-        <div className="flex items-end bg-card p-4"><Button type="submit" className="w-full sm:w-auto"><HugeiconsIcon icon={Exchange01Icon} strokeWidth={2} />Compare</Button></div>
-      </form>
+      <ProfileComparisonForm
+        initialLeft={left ? toProfileSuggestion(left) : null}
+        initialRight={right ? toProfileSuggestion(right) : null}
+        errorMessage={comparisonError}
+      />
 
       {left && right ? (
         <>
@@ -113,7 +127,7 @@ export default async function ComparePage({
           </div>
         </>
       ) : (
-        <div className="flex min-h-48 items-center justify-center rounded-md border border-border px-6 text-center text-sm text-muted-foreground">Enter two verified LeetRank usernames to create a comparison.</div>
+        <div className="flex min-h-48 items-center justify-center rounded-md border border-border px-6 text-center text-sm text-muted-foreground">Search for and select two verified LeetRank profiles to create a comparison.</div>
       )}
     </div>
   );
