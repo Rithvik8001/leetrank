@@ -7,6 +7,8 @@ import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SectionLabel } from "@/components/marketing/section-label";
+import { LeetCodeStats } from "@/components/dashboard/leetcode-stats";
+import type { LeetCodeBadge } from "@/lib/leetcode";
 
 function firstName(name: string) {
   return name.trim().split(" ")[0] || name;
@@ -26,22 +28,33 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const formatNumber = (value: number | null) =>
+    value == null ? "—" : value.toLocaleString();
+  const badges = Array.isArray(user.leetcodeBadges)
+    ? (user.leetcodeBadges as unknown as LeetCodeBadge[])
+    : [];
   const stats = [
-    {
-      label: "Problems solved",
-      value: (user.leetcodeTotalSolved ?? 0).toLocaleString(),
-    },
+    { label: "Problems solved", value: formatNumber(user.leetcodeTotalSolved) },
+    { label: "Easy", value: formatNumber(user.leetcodeEasySolved) },
+    { label: "Medium", value: formatNumber(user.leetcodeMediumSolved) },
+    { label: "Hard", value: formatNumber(user.leetcodeHardSolved) },
     {
       label: "Global rank",
-      value:
-        user.leetcodeRanking != null
-          ? `#${user.leetcodeRanking.toLocaleString()}`
-          : "—",
+      value: user.leetcodeRanking == null ? "—" : `#${formatNumber(user.leetcodeRanking)}`,
     },
     {
-      label: "LeetCode handle",
-      value: user.leetcodeUsername ?? "—",
-      mono: true,
+      label: "Contest rating",
+      value:
+        user.leetcodeContestRating == null
+          ? "—"
+          : Math.round(user.leetcodeContestRating).toLocaleString(),
+    },
+    {
+      label: "Contest global",
+      value:
+        user.leetcodeContestGlobalRanking == null
+          ? "—"
+          : `#${formatNumber(user.leetcodeContestGlobalRanking)}`,
     },
   ];
 
@@ -59,24 +72,17 @@ export default async function DashboardPage() {
         ) : null}
       </header>
 
-      <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
-        {stats.map((stat) => (
-          <div key={stat.label} className="flex flex-col gap-3 bg-card p-6">
-            <span className="font-mono text-[0.62rem] tracking-[0.16em] text-muted-foreground uppercase">
-              {stat.label}
-            </span>
-            <span
-              className={
-                stat.mono
-                  ? "truncate font-mono text-2xl text-foreground"
-                  : "font-mono text-4xl font-semibold tracking-tight text-foreground tabular-nums"
-              }
-            >
-              {stat.value}
-            </span>
-          </div>
-        ))}
-      </div>
+      {user.leetcodeUsername ? (
+        <LeetCodeStats
+          username={user.leetcodeUsername}
+          status={user.leetcodeSyncStatus}
+          error={user.leetcodeSyncError}
+          lastSyncedAt={user.leetcodeLastSyncedAt?.toISOString() ?? null}
+          lastAttemptAt={user.leetcodeLastSyncAttemptAt?.toISOString() ?? null}
+          stats={stats}
+          badges={badges}
+        />
+      ) : null}
 
       {user.university ? (
         <Link

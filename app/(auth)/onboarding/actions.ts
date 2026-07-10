@@ -19,6 +19,8 @@ import {
   LeetCodeRateLimitedError,
   LeetCodeFetchError,
 } from "@/lib/leetcode";
+import { profileStatsData } from "@/lib/leetcode-sync";
+import { LeetcodeSyncStatus } from "@prisma/client";
 
 type ActionResult<T = undefined> =
   | ({ ok: true } & (T extends undefined ? object : { data: T }))
@@ -139,6 +141,7 @@ export async function verifyLeetcodeBio(): Promise<ActionResult> {
     };
   }
 
+  const syncedAt = new Date();
   await prisma.user.update({
     where: { id: user.id },
     data: {
@@ -146,12 +149,11 @@ export async function verifyLeetcodeBio(): Promise<ActionResult> {
       leetcodeVerifiedAt: new Date(),
       leetcodeVerificationCode: null,
       leetcodeVerificationCodeExpiresAt: null,
-      leetcodeTotalSolved: profile.totalSolved,
-      leetcodeEasySolved: profile.easySolved,
-      leetcodeMediumSolved: profile.mediumSolved,
-      leetcodeHardSolved: profile.hardSolved,
-      leetcodeRanking: profile.ranking,
-      leetcodeLastSyncedAt: new Date(),
+      ...profileStatsData(profile),
+      leetcodeSyncStatus: LeetcodeSyncStatus.SUCCESS,
+      leetcodeSyncError: null,
+      leetcodeLastSyncAttemptAt: syncedAt,
+      leetcodeLastSyncedAt: syncedAt,
     },
   });
 

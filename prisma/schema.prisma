@@ -35,12 +35,27 @@ model User {
   leetcodeMediumSolved Int?
   leetcodeHardSolved   Int?
   leetcodeRanking      Int?
+  leetcodeContestRating       Float?
+  leetcodeContestGlobalRanking Int?
+  leetcodeBadges              Json?
+  leetcodeSyncStatus          LeetcodeSyncStatus @default(IDLE)
+  leetcodeSyncError           String?
+  leetcodeLastSyncAttemptAt   DateTime?
   leetcodeLastSyncedAt DateTime?
 
   @@unique([email])
   @@unique([leetcodeUsername])
   @@index([universityId])
   @@map("user")
+}
+
+enum LeetcodeSyncStatus {
+  IDLE
+  PENDING
+  SUCCESS
+  FAILED
+
+  @@map("leetcode_sync_status")
 }
 
 enum OwnershipType {
