@@ -110,9 +110,9 @@ export default async function UniversityProfilePage({
               {leaderboard.map((student) => {
                 const profileHref = student.publicProfileEnabled && student.publicProfileHandle ? `/u/${student.publicProfileHandle}` : null;
                 return (
-                  <div key={student.id} className={cn("relative grid grid-cols-[3rem_15rem_repeat(5,5rem)_7rem_8rem] items-center border-b border-border last:border-b-0 hover:bg-muted/30", student.rank === 1 && "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-gold")}>
-                    <span className={cn("sticky left-0 z-10 bg-card px-3 py-3 text-right font-mono text-sm tabular-nums group-hover:bg-muted", student.rank === 1 ? "text-gold" : "text-muted-foreground")}>{student.rank == null ? "—" : String(student.rank).padStart(2, "0")}</span>
-                    <div className="sticky left-12 z-10 min-w-0 bg-card px-3 py-3">
+                  <div key={student.id} className={cn("group relative grid grid-cols-[3rem_15rem_repeat(5,5rem)_7rem_8rem] items-center border-b border-border last:border-b-0 hover:bg-muted", student.rank === 1 && "before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-gold")}>
+                    <span className={cn("sticky left-0 z-10 bg-card px-3 py-3 text-right font-mono text-sm tabular-nums group-hover:bg-muted", student.rank === 1 ? "text-gold" : student.rank != null && student.rank <= 3 ? "text-foreground" : "text-muted-foreground")}>{student.rank == null ? "—" : String(student.rank).padStart(2, "0")}</span>
+                    <div className="sticky left-12 z-10 min-w-0 bg-card px-3 py-3 group-hover:bg-muted">
                       {profileHref ? <Link href={profileHref} className="block truncate text-sm font-medium hover:underline">{student.name}</Link> : <p className="truncate text-sm font-medium">{student.name}</p>}
                       <p className="truncate font-mono text-xs text-muted-foreground">@{student.leetcodeUsername}</p>
                     </div>

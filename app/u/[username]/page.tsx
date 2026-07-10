@@ -10,6 +10,7 @@ import { getPublicProfile, normalizePublicHandle } from "@/lib/users/profiles";
 import { Wordmark } from "@/components/wordmark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SectionLabel } from "@/components/marketing/section-label";
+import { StatTile } from "@/components/standings";
 import { Button } from "@/components/ui/button";
 import { ShareActions } from "@/components/share-actions";
 
@@ -65,7 +66,7 @@ export default async function PublicProfilePage({ params }: Props) {
         </section>
 
         <section className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Latest LeetCode statistics">
-          {stats.map(([label, stat]) => <div key={label} className="flex min-h-28 flex-col justify-between bg-card p-5"><span className="font-mono text-[0.62rem] tracking-[0.16em] text-muted-foreground uppercase">{label}</span><span className="font-mono text-3xl font-semibold tracking-tight tabular-nums">{stat}</span></div>)}
+          {stats.map(([label, stat]) => <StatTile key={label} label={label} value={stat} />)}
         </section>
 
         <section className="overflow-hidden rounded-md border border-border bg-card">

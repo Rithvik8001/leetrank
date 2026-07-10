@@ -49,6 +49,39 @@ export function profileStatsData(profile: LeetCodePublicProfile) {
   };
 }
 
+export function snapshotStatsData(profile: LeetCodePublicProfile) {
+  return {
+    totalSolved: profile.totalSolved,
+    easySolved: profile.easySolved,
+    mediumSolved: profile.mediumSolved,
+    hardSolved: profile.hardSolved,
+    contestRating: profile.contestRating,
+    ranking: profile.ranking,
+  };
+}
+
+export function utcDayStart(now: Date): Date {
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+}
+
+// One snapshot per verified user per UTC day; latest sync of the day wins.
+// Best-effort: callers must not let a snapshot failure regress a successful sync.
+export async function recordDailySnapshot(
+  userId: string,
+  profile: LeetCodePublicProfile,
+  now = new Date(),
+) {
+  const capturedOn = utcDayStart(now);
+  const stats = snapshotStatsData(profile);
+  await prisma.leetcodeSnapshot.upsert({
+    where: { userId_capturedOn: { userId, capturedOn } },
+    update: { capturedAt: now, ...stats },
+    create: { id: crypto.randomUUID(), userId, capturedOn, capturedAt: now, ...stats },
+  });
+}
+
 export function syncErrorMessage(error: unknown): string {
   if (error instanceof LeetCodeProfileNotFoundError) {
     return "We couldn't find your verified LeetCode profile.";
@@ -139,6 +172,11 @@ export async function syncVerifiedUserStats(
         leetcodeLastSyncedAt: new Date(),
       },
     });
+    try {
+      await recordDailySnapshot(userId, profile, now);
+    } catch (snapshotError) {
+      console.warn(`Daily snapshot failed for user ${userId}:`, snapshotError);
+    }
     return { ok: true, kind: "success" };
   } catch (error) {
     const message = syncErrorMessage(error);
@@ -148,4 +186,27 @@ export async function syncVerifiedUserStats(
     });
     return { ok: false, kind: "failed", error: message };
   }
+}
+
+// Batch sync for the daily cron. Sequential + paced to respect LeetCode's
+// unofficial GraphQL endpoint; a per-user failure never aborts the batch.
+export async function syncAllVerifiedUsers(now = new Date()) {
+  const users = await prisma.user.findMany({
+    where: { leetcodeVerified: true, leetcodeUsername: { not: null } },
+    select: { id: true },
+  });
+
+  let ok = 0;
+  let failed = 0;
+  for (const user of users) {
+    const result = await syncVerifiedUserStats(user.id, now);
+    if (result.ok) {
+      ok += 1;
+    } else {
+      failed += 1;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 750));
+  }
+
+  return { total: users.length, ok, failed };
 }

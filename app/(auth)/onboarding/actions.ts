@@ -19,7 +19,7 @@ import {
   LeetCodeRateLimitedError,
   LeetCodeFetchError,
 } from "@/lib/leetcode";
-import { profileStatsData } from "@/lib/leetcode-sync";
+import { profileStatsData, recordDailySnapshot } from "@/lib/leetcode-sync";
 import { normalizePublicHandle } from "@/lib/users/profiles";
 import { LeetcodeSyncStatus } from "@prisma/client";
 
@@ -159,6 +159,12 @@ export async function verifyLeetcodeBio(): Promise<ActionResult> {
       leetcodeLastSyncedAt: syncedAt,
     },
   });
+
+  try {
+    await recordDailySnapshot(user.id, profile, syncedAt);
+  } catch (snapshotError) {
+    console.warn(`Daily snapshot failed for user ${user.id}:`, snapshotError);
+  }
 
   return { ok: true };
 }

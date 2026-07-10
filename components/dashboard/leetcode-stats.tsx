@@ -12,7 +12,7 @@ import type { SyncResult } from "@/lib/leetcode-sync";
 import type { LeetCodeBadge } from "@/lib/leetcode";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { LiveTag } from "@/components/standings";
+import { LiveTag, StatTile } from "@/components/standings";
 
 type SyncStatus = "IDLE" | "PENDING" | "SUCCESS" | "FAILED";
 const SYNC_COOLDOWN_MS = 15 * 60 * 1000;
@@ -114,14 +114,7 @@ export function LeetCodeStats({
 
         <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="flex min-h-28 flex-col justify-between bg-card p-5">
-              <span className="font-mono text-[0.62rem] tracking-[0.16em] text-muted-foreground uppercase">
-                {stat.label}
-              </span>
-              <span className="font-mono text-3xl font-semibold tracking-tight text-foreground tabular-nums">
-                {stat.value}
-              </span>
-            </div>
+            <StatTile key={stat.label} label={stat.label} value={stat.value} />
           ))}
         </div>
       </div>

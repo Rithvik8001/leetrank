@@ -46,11 +46,33 @@ model User {
   publicProfileEnabled Boolean @default(false)
   publicProfileHandle  String?
 
+  leetcodeSnapshots LeetcodeSnapshot[]
+
   @@unique([email])
   @@unique([leetcodeUsername])
   @@unique([publicProfileHandle])
   @@index([universityId])
   @@map("user")
+}
+
+model LeetcodeSnapshot {
+  id     String @id
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  totalSolved   Int
+  easySolved    Int
+  mediumSolved  Int
+  hardSolved    Int
+  contestRating Float?
+  ranking       Int?
+
+  capturedAt DateTime @default(now())
+  capturedOn DateTime @db.Date
+
+  @@unique([userId, capturedOn])
+  @@index([userId, capturedAt])
+  @@map("leetcode_snapshot")
 }
 
 enum LeetcodeSyncStatus {

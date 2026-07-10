@@ -103,6 +103,37 @@ export function StatCell({
   );
 }
 
+/**
+ * A large scorecard tile — mono uppercase caption above a loud tabular number.
+ * The scorecard counterpart to the ledger's compact `StatCell`; shared by the
+ * dashboard and public-profile stat grids so both surfaces stay identical.
+ */
+export function StatTile({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex min-h-28 flex-col justify-between bg-card p-5",
+        className,
+      )}
+    >
+      <span className="font-mono text-[0.62rem] tracking-[0.16em] text-muted-foreground uppercase">
+        {label}
+      </span>
+      <span className="font-mono text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+        {value}
+      </span>
+    </div>
+  );
+}
+
 /** Rating movement, rendered with a triangle glyph. Muted greens/reds so brass stays the loudest color. */
 export function Delta({
   delta,
