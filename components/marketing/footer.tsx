@@ -15,7 +15,7 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-14">
+          <div className="grid grid-cols-2 gap-8 sm:gap-14">
             {footer.columns.map((column) => (
               <div key={column.heading} className="flex flex-col gap-3">
                 <p className="font-mono text-[0.68rem] font-medium tracking-[0.2em] text-muted-foreground uppercase">

@@ -52,8 +52,7 @@ export function RankTicker() {
       aria-hidden="true"
     >
       <div className="z-10 flex shrink-0 items-center gap-2 border-r border-border bg-card px-4 py-3 font-mono text-[0.62rem] font-medium tracking-[0.2em] text-foreground uppercase">
-        <span className="live-dot" />
-        Live
+        Preview
       </div>
       <div className="mask-[linear-gradient(to_right,transparent,black_2rem,black_calc(100%-2rem),transparent)] flex flex-1 overflow-hidden">
         <div className="flex animate-marquee items-center py-3">

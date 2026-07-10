@@ -23,20 +23,31 @@ function ProfileSelector({
   name,
   placeholder,
   initialValue,
+  initialQuery,
+  initialError,
   excludedHandle,
+  publicOnly,
   onValueChange,
 }: {
   label: string;
   name: "left" | "right";
   placeholder: string;
   initialValue: ProfileSuggestion | null;
+  initialQuery: string;
+  initialError: string | null;
   excludedHandle: string | null;
+  publicOnly: boolean;
   onValueChange: (value: ProfileSuggestion | null) => void;
 }) {
   const [selected, setSelected] = useState<ProfileSuggestion | null>(initialValue);
-  const [inputValue, setInputValue] = useState(initialValue?.leetcodeUsername ?? "");
+  const [inputValue, setInputValue] = useState(
+    initialValue?.leetcodeUsername ?? initialQuery,
+  );
   const [results, setResults] = useState<ProfileSuggestion[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [open, setOpen] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(initialError);
+  const errorId = `${name}-profile-error`;
 
   useEffect(() => {
     const query = inputValue.trim();
@@ -95,6 +106,8 @@ function ProfileSelector({
     setInputValue(next?.leetcodeUsername ?? "");
     setResults([]);
     setStatus("idle");
+    setOpen(false);
+    setFieldError(null);
     onValueChange(next);
   }
 
@@ -110,16 +123,20 @@ function ProfileSelector({
       <Combobox
         items={visibleResults}
         filter={null}
+        open={open}
         value={selected}
         inputValue={inputValue}
         itemToStringLabel={(profile: ProfileSuggestion) => profile.leetcodeUsername}
         isItemEqualToValue={(profile, value) => profile.handle === value.handle}
+        onOpenChange={setOpen}
         onValueChange={select}
         onInputValueChange={(next, details) => {
           setInputValue(next);
           if (details.reason === "input-change" || details.reason === "input-clear") {
             setResults([]);
             setStatus("idle");
+            setOpen(Boolean(next));
+            setFieldError(null);
             if (selected) {
               setSelected(null);
               onValueChange(null);
@@ -132,6 +149,8 @@ function ProfileSelector({
           placeholder={placeholder}
           showClear={Boolean(inputValue)}
           autoComplete="off"
+          aria-invalid={Boolean(fieldError)}
+          aria-describedby={fieldError ? errorId : undefined}
         />
         <ComboboxContent>
           <ComboboxEmpty>
@@ -141,7 +160,9 @@ function ProfileSelector({
                 ? "Search unavailable. Try again."
                 : inputValue.trim().length < 2
                   ? "Type at least 2 characters."
-                  : "No matching profiles."}
+                  : publicOnly
+                    ? "No matching public profiles."
+                    : "No matching verified profiles."}
           </ComboboxEmpty>
           <ComboboxList>
             <ComboboxCollection>
@@ -169,6 +190,11 @@ function ProfileSelector({
       <span className="sr-only" role="status" aria-live="polite">
         {announcement}
       </span>
+      {fieldError ? (
+        <p id={errorId} className="text-xs text-destructive">
+          {fieldError}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -176,11 +202,19 @@ function ProfileSelector({
 export function ProfileComparisonForm({
   initialLeft,
   initialRight,
-  errorMessage,
+  initialLeftQuery,
+  initialRightQuery,
+  leftError,
+  rightError,
+  publicOnly,
 }: {
   initialLeft: ProfileSuggestion | null;
   initialRight: ProfileSuggestion | null;
-  errorMessage?: string | null;
+  initialLeftQuery: string;
+  initialRightQuery: string;
+  leftError: string | null;
+  rightError: string | null;
+  publicOnly: boolean;
 }) {
   const [left, setLeft] = useState(initialLeft);
   const [right, setRight] = useState(initialRight);
@@ -198,7 +232,10 @@ export function ProfileComparisonForm({
           name="left"
           placeholder="Search a LeetCode username"
           initialValue={initialLeft}
+          initialQuery={initialLeftQuery}
+          initialError={leftError}
           excludedHandle={right?.handle ?? null}
+          publicOnly={publicOnly}
           onValueChange={setLeft}
         />
         <ProfileSelector
@@ -206,7 +243,10 @@ export function ProfileComparisonForm({
           name="right"
           placeholder="Search another username"
           initialValue={initialRight}
+          initialQuery={initialRightQuery}
+          initialError={rightError}
           excludedHandle={left?.handle ?? null}
+          publicOnly={publicOnly}
           onValueChange={setRight}
         />
         <div className="flex items-end bg-card p-4">
@@ -216,9 +256,7 @@ export function ProfileComparisonForm({
           </Button>
         </div>
       </form>
-      {errorMessage ? (
-        <p className="text-sm text-destructive" role="alert">{errorMessage}</p>
-      ) : duplicate ? (
+      {duplicate ? (
         <p className="text-sm text-destructive" role="alert">Choose two different profiles.</p>
       ) : null}
     </div>

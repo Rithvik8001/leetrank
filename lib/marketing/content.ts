@@ -9,16 +9,16 @@ export const nav = {
 } as const;
 
 export const hero = {
-  eyebrow: "Now live at 340+ universities",
+  eyebrow: "Available for 140+ universities",
   headline: "The leaderboard of record for competitive programmers.",
   subhead:
-    "Connect your LeetCode account, verify in seconds, and see exactly where you stand against every CP student at your university — and every university around it.",
+    "Connect your LeetCode account and see exactly where you stand among verified programmers at your university and across the LeetRank network.",
   primaryCta: { label: "Claim your rank", href: "/signup" },
-  secondaryCta: { label: "See a live leaderboard", href: "#analytics" },
+  secondaryCta: { label: "Preview the standings", href: "#analytics" },
 } as const;
 
 export const socialProof = {
-  label: "Trusted by CP communities at",
+  label: "Illustrative campus network",
   universities: [
     "Northbridge Tech",
     "Riverside State",
@@ -44,10 +44,10 @@ export const problemSection = {
   after: {
     label: "With LeetRank",
     items: [
-      "One verified roster, always current",
-      "Synced automatically from LeetCode",
+      "One verified roster with current snapshots",
+      "Synced daily or refreshed on demand",
       "Ranked by rating, solves, or contest performance",
-      "Updated the moment a submission lands",
+      "Progress tracked across daily snapshots",
     ],
   },
 } as const;
@@ -72,13 +72,13 @@ export const howItWorks = {
       number: "03",
       title: "Sync",
       description:
-        "LeetRank pulls your solved problems, contest rating, and submission history automatically.",
+        "LeetRank pulls your solved totals, contest rating, rank, and badges into one verified snapshot.",
     },
     {
       number: "04",
       title: "Compete",
       description:
-        "You're ranked instantly against your university — and every other one on LeetRank.",
+        "Join your campus standings, compare verified profiles, and compete in private groups.",
     },
   ],
 } as const;
@@ -88,9 +88,9 @@ export const featureGrid = {
   heading: "Everything a CP club actually needs.",
   features: [
     {
-      title: "Live university leaderboards",
+      title: "University leaderboards",
       description:
-        "Ranked by rating, problems solved, or contest performance — updated the moment new submissions land.",
+        "Ranked by rating, problems solved, hard problems, or global rank using the latest successful sync.",
       size: "wide",
       href: "#universities",
       cta: "View leaderboards",
@@ -98,14 +98,14 @@ export const featureGrid = {
     {
       title: "Progress analytics",
       description:
-        "Submission heatmaps and rating history, tracked automatically — the detail a spreadsheet never captured.",
+        "Solved totals, hard-problem progress, and contest-rating history across daily snapshots.",
       size: "tall",
       href: "#analytics",
       cta: "See the data",
     },
     {
       title: "Peer comparison",
-      description: "Head-to-head stats against any classmate, section, or year.",
+      description: "Head-to-head stats against another verified LeetRank profile.",
       size: "sm",
       href: "/signup",
       cta: "Compare stats",
@@ -125,11 +125,12 @@ export const featureGrid = {
       cta: "Claim your profile",
     },
     {
-      title: "Contest tracking",
-      description: "Upcoming and past contest performance, synced from LeetCode.",
+      title: "Contest history",
+      description: "Upcoming contests and detailed past-contest performance are on the roadmap.",
       size: "sm",
       href: "/signup",
-      cta: "Get started",
+      cta: "Join early access",
+      status: "coming-soon",
     },
   ],
 } as const;
@@ -137,23 +138,24 @@ export const featureGrid = {
 export const analyticsPreview = {
   eyebrow: "Progress analytics",
   heading: "See the grind, not just the total.",
-  body: "Every submission plotted on a calendar. Every rating change plotted on a timeline. The kind of detail a spreadsheet never captured.",
-  heatmapLabel: "Submissions, last 120 days",
+  body: "Daily snapshots already track solved progress and rating trends. Submission-level history is the next layer on the roadmap.",
+  heatmapLabel: "Submission history",
+  heatmapStatus: "Coming soon",
   ratingLabel: "Contest rating",
 } as const;
 
 export const clubCta = {
   eyebrow: "For club admins",
   heading: "Run a club? Bring your whole roster onto one leaderboard.",
-  body: "Invite your entire ACM, ICPC, or GDSC chapter in one link. No more manually chasing usernames before every meeting.",
-  cta: { label: "Set up your club", href: "/clubs/new" },
+  body: "Create a private group after verification, then invite your ACM, ICPC, or GDSC peers with one link.",
+  cta: { label: "Set up your group", href: "/signup" },
 } as const;
 
 export const statsBand = {
   disclaimer: "Illustrative data — LeetRank is in early access.",
   stats: [
     { value: 12400, suffix: "+", label: "problems solved this week" },
-    { value: 340, suffix: "+", label: "universities represented" },
+    { value: 140, suffix: "+", label: "universities available" },
     { value: 8900, suffix: "+", label: "verified student profiles" },
   ],
 } as const;
@@ -180,7 +182,7 @@ export const faq = {
     {
       question: "Can I remove my profile later?",
       answer:
-        "Yes. You can unverify or delete your LeetRank profile at any time, which removes you from all leaderboards immediately.",
+        "You can hide your public profile at any time. Full account deletion and LeetCode unverification controls are planned.",
     },
     {
       question: "Does this work for other universities, not just my own?",
@@ -212,13 +214,6 @@ export const footer = {
       links: [
         { label: "For clubs", href: "#club-cta" },
         { label: "FAQ", href: "#faq" },
-      ],
-    },
-    {
-      heading: "Legal",
-      links: [
-        { label: "Privacy", href: "/privacy" },
-        { label: "Terms", href: "/terms" },
       ],
     },
   ],

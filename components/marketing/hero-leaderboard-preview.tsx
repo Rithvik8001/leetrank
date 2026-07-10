@@ -1,10 +1,4 @@
-import {
-  Ledger,
-  LedgerRow,
-  RankNumber,
-  Delta,
-  LiveTag,
-} from "@/components/standings";
+import { Ledger, LedgerRow, RankNumber, Delta } from "@/components/standings";
 import { heroLeaderboard } from "@/lib/marketing/placeholder-data";
 
 export function HeroLeaderboardPreview() {
@@ -15,7 +9,9 @@ export function HeroLeaderboardPreview() {
         <span className="font-mono text-[0.68rem] font-medium tracking-[0.16em] text-foreground uppercase">
           Northbridge Tech
         </span>
-        <LiveTag>Live · this week</LiveTag>
+        <span className="font-mono text-[0.62rem] tracking-[0.14em] text-muted-foreground uppercase">
+          Illustrative · this week
+        </span>
       </div>
 
       {/* Column captions */}

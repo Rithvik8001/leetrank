@@ -26,7 +26,7 @@ export function AnalyticsPreview() {
       <StaggerGroup className="grid gap-px overflow-hidden rounded-md border border-border bg-border md:grid-cols-2">
         <StaggerItem className="flex flex-col gap-5 bg-card p-7">
           <p className="font-mono text-[0.68rem] tracking-[0.16em] text-muted-foreground uppercase">
-            {analyticsPreview.heatmapLabel}
+            {analyticsPreview.heatmapLabel} · {analyticsPreview.heatmapStatus}
           </p>
           <AnalyticsHeatmap days={submissionHeatmap} />
         </StaggerItem>

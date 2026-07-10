@@ -68,12 +68,11 @@ export default async function ComparePage({
   ]);
   const leftHandle = left?.publicProfileHandle ?? requestedLeftHandle;
   const ready = Boolean(left && right);
-  const invalidHandles = [
-    explicitLeft && !left ? rawLeft : null,
-    explicitRight && !right ? rawRight : null,
-  ].filter((handle): handle is string => Boolean(handle));
-  const comparisonError = invalidHandles.length
-    ? `We couldn't find ${invalidHandles.length === 1 ? `@${invalidHandles[0]}` : "one or both profiles"}. Search for a verified LeetRank username and select it from the results.`
+  const leftError = explicitLeft && !left
+    ? `No verified profile found for @${rawLeft}.`
+    : null;
+  const rightError = explicitRight && !right
+    ? `No verified profile found for @${rawRight}.`
     : null;
 
   const leftDistribution = left ? difficultyDistribution({ total: left.leetcodeTotalSolved, easy: left.leetcodeEasySolved, medium: left.leetcodeMediumSolved, hard: left.leetcodeHardSolved }) : null;
@@ -102,7 +101,11 @@ export default async function ComparePage({
       <ProfileComparisonForm
         initialLeft={left ? toProfileSuggestion(left) : null}
         initialRight={right ? toProfileSuggestion(right) : null}
-        errorMessage={comparisonError}
+        initialLeftQuery={left ? "" : rawLeft}
+        initialRightQuery={right ? "" : rawRight}
+        leftError={leftError}
+        rightError={rightError}
+        publicOnly={publicOnly}
       />
 
       {left && right ? (

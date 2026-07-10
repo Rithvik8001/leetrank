@@ -45,11 +45,18 @@ export function FeatureGrid() {
               key={feature.title}
               className="group flex flex-col gap-3.5 bg-background p-7"
             >
-              <HugeiconsIcon
-                icon={icons[i]}
-                className="size-5 text-muted-foreground"
-                strokeWidth={1.75}
-              />
+              <div className="flex items-center justify-between gap-3">
+                <HugeiconsIcon
+                  icon={icons[i]}
+                  className="size-5 text-muted-foreground"
+                  strokeWidth={1.75}
+                />
+                {"status" in feature && feature.status === "coming-soon" ? (
+                  <span className="font-mono text-[0.6rem] tracking-[0.14em] text-muted-foreground uppercase">
+                    Coming soon
+                  </span>
+                ) : null}
+              </div>
               <h3 className="font-heading text-base font-semibold tracking-tight text-foreground">
                 {feature.title}
               </h3>
