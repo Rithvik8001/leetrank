@@ -38,7 +38,7 @@ export function PublicProfileControls({ enabled, handle }: { enabled: boolean; h
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button nativeButton={false} render={<Link href={`/users/${handle}`} />}>
+      <Button nativeButton={false} render={<Link href={`/u/${handle}`} />}>
         <HugeiconsIcon icon={Share01Icon} strokeWidth={2} />
         View public profile
       </Button>

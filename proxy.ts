@@ -10,7 +10,12 @@ const authOnlyRoutes = new Set(["/login", "/signup"]);
 const onboardingExemptRoutes = new Set(["/onboarding", "/dashboard"]);
 
 function isPublicRoute(pathname: string) {
-  return publicRoutes.has(pathname) || pathname.startsWith("/users/");
+  return (
+    publicRoutes.has(pathname) ||
+    pathname === "/compare" ||
+    pathname.startsWith("/u/") ||
+    pathname.startsWith("/users/")
+  );
 }
 
 export async function proxy(request: NextRequest) {

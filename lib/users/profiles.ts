@@ -41,7 +41,7 @@ export async function getUniversityRank(
   return competitionRank(ahead, totalSolved);
 }
 
-const publicProfileSelect = {
+export const verifiedProfileSelect = {
   name: true,
   leetcodeUsername: true,
   leetcodeVerified: true,
@@ -55,6 +55,8 @@ const publicProfileSelect = {
   leetcodeBadges: true,
   leetcodeLastSyncedAt: true,
   universityId: true,
+  publicProfileHandle: true,
+  publicProfileEnabled: true,
   university: { select: { name: true, slug: true, city: true, state: true } },
 } satisfies Prisma.UserSelect;
 
@@ -65,7 +67,7 @@ export const getPublicProfile = cache(async function getPublicProfile(handle: st
       publicProfileEnabled: true,
       leetcodeVerified: true,
     },
-    select: publicProfileSelect,
+    select: verifiedProfileSelect,
   });
   if (!user) return null;
   return {
@@ -74,3 +76,25 @@ export const getPublicProfile = cache(async function getPublicProfile(handle: st
     universityRank: await getUniversityRank(user.universityId, user.leetcodeTotalSolved),
   };
 });
+
+export function comparisonVisibilityFilter(publicOnly: boolean) {
+  return {
+    leetcodeVerified: true,
+    ...(publicOnly ? { publicProfileEnabled: true } : {}),
+  } as const;
+}
+
+export async function getComparableProfile(handle: string, publicOnly: boolean) {
+  const user = await prisma.user.findFirst({
+    where: {
+      publicProfileHandle: normalizePublicHandle(handle),
+      ...comparisonVisibilityFilter(publicOnly),
+    },
+    select: verifiedProfileSelect,
+  });
+  if (!user) return null;
+  return {
+    ...user,
+    universityRank: await getUniversityRank(user.universityId, user.leetcodeTotalSolved),
+  };
+}

@@ -38,6 +38,6 @@ export async function setPublicProfileEnabled(enabled: boolean) {
   }
 
   revalidatePath("/dashboard");
-  revalidatePath(`/users/${handle}`);
+  revalidatePath(`/u/${handle}`);
   return { ok: true as const, enabled, handle };
 }

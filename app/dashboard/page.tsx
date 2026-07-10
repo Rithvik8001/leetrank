@@ -89,9 +89,9 @@ export default async function DashboardPage() {
         </div>
         <div className="flex flex-col gap-3 border-t border-border bg-muted/20 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <PublicProfileControls enabled={user.publicProfileEnabled} handle={profileHandle} />
-          <Button variant="ghost" nativeButton={false} render={<Link href="/compare" />}>
+          <Button variant="ghost" nativeButton={false} render={<Link href={`/compare?left=${profileHandle}`} />}>
             <HugeiconsIcon icon={UserMultipleIcon} strokeWidth={2} />
-            Compare with a classmate
+            Compare profiles
           </Button>
         </div>
       </header>
