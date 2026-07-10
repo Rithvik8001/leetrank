@@ -10,10 +10,14 @@ import {
   parseLeaderboardSort,
   rankLeaderboard,
 } from "@/lib/leaderboard";
+import { getUniversityInsights } from "@/lib/universities/insights";
+import { getCampusActivityFeed } from "@/lib/activity/feed";
 import { cn } from "@/lib/utils";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { SectionLabel } from "@/components/marketing/section-label";
 import { LiveTag } from "@/components/standings";
+import { UniversityInsights } from "@/components/universities/university-insights";
+import { UniversityActivity } from "@/components/universities/university-activity";
 
 const OWNERSHIP_LABEL: Record<string, string> = {
   PUBLIC: "Public",
@@ -56,6 +60,10 @@ export default async function UniversityProfilePage({
     },
   });
   const leaderboard = rankLeaderboard(users, sort);
+  const [insights, activity] = await Promise.all([
+    getUniversityInsights(university.id, users),
+    getCampusActivityFeed(university.id),
+  ]);
 
   return (
     <div className="flex flex-col gap-10 px-6 py-12">
@@ -73,6 +81,10 @@ export default async function UniversityProfilePage({
           {university.website ? <><span aria-hidden="true">·</span><a href={university.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-foreground underline decoration-gold decoration-2 underline-offset-4"><HugeiconsIcon icon={Globe02Icon} strokeWidth={2} className="size-3.5" />{university.website.replace(/^https?:\/\//, "")}</a></> : null}
         </div>
       </header>
+
+      {leaderboard.length ? <UniversityInsights data={insights} /> : null}
+
+      {leaderboard.length ? <UniversityActivity events={activity} /> : null}
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-1 rounded-md border border-border bg-muted/20 p-1" aria-label="Leaderboard sort">
