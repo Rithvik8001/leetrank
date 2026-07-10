@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { Wordmark } from "@/components/wordmark";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 export default function GroupsLayout({ children }: { children: ReactNode }) {
   return (
@@ -18,7 +18,7 @@ export default function GroupsLayout({ children }: { children: ReactNode }) {
           >
             Dashboard
           </Link>
-          <ThemeToggle />
+          <LogoutButton />
         </div>
       </header>
       <main className="flex-1">{children}</main>

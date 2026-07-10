@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { Wordmark } from "@/components/wordmark";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function CompareLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,7 +11,6 @@ export default function CompareLayout({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-5">
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">Dashboard</Link>
           <Link href="/universities" className="hidden text-sm text-muted-foreground hover:text-foreground sm:block">Universities</Link>
-          <ThemeToggle />
         </div>
       </header>
       <main className="flex-1">{children}</main>

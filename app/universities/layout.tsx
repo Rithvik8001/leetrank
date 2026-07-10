@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { Wordmark } from "@/components/wordmark";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 export default function UniversitiesLayout({
   children,
@@ -28,7 +28,7 @@ export default function UniversitiesLayout({
           >
             Groups
           </Link>
-          <ThemeToggle />
+          <LogoutButton />
         </div>
       </header>
       <main className="flex-1">{children}</main>

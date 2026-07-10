@@ -10,7 +10,6 @@ import { getPublicProfile, normalizePublicHandle } from "@/lib/users/profiles";
 import { getUserSnapshots } from "@/lib/users/snapshots";
 import { daysAgo } from "@/lib/users/progress";
 import { Wordmark } from "@/components/wordmark";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { SectionLabel } from "@/components/marketing/section-label";
 import { StatTile } from "@/components/standings";
 import { HistoryCharts } from "@/components/charts/history-charts";
@@ -55,7 +54,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
   return (
     <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col border-x border-border">
-      <header className="flex h-16 items-center justify-between border-b border-border px-6"><Link href="/" aria-label="LeetRank home"><Wordmark /></Link><ThemeToggle /></header>
+      <header className="flex h-16 items-center border-b border-border px-6"><Link href="/" aria-label="LeetRank home"><Wordmark /></Link></header>
       <main className="flex flex-col gap-8 px-6 py-12 sm:py-16">
         <section className="flex flex-col gap-6 border-b border-border pb-10 sm:flex-row sm:items-end sm:justify-between">
           <div>

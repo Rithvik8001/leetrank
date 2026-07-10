@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Wordmark } from "@/components/wordmark";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 export default async function DashboardLayout({
   children,
@@ -42,7 +42,7 @@ export default async function DashboardLayout({
           >
             Groups
           </Link>
-          <ThemeToggle />
+          <LogoutButton />
         </div>
       </header>
       <main className="flex-1">{children}</main>
