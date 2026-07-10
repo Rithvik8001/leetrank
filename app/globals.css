@@ -181,6 +181,11 @@
   .font-heading {
     font-feature-settings: "ss01";
   }
+  /* Text selection reads as the brand action — brass wash, ink text. */
+  ::selection {
+    background: var(--gold);
+    color: var(--gold-foreground);
+  }
 }
 
 /* Hairline ledger rules — the recurring structural device. */
