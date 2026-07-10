@@ -9,12 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 
 export function StepVerifyInstructions({
-  username,
   code,
   isPending,
   onVerify,
 }: {
-  username: string;
   code: string;
   isPending: boolean;
   onVerify: () => void;
@@ -57,18 +55,21 @@ export function StepVerifyInstructions({
 
       <ol className="list-decimal space-y-1.5 pl-4 text-sm text-muted-foreground">
         <li>
-          Go to{" "}
+          Open{" "}
           <a
-            href={`https://leetcode.com/${username}/`}
+            href="https://leetcode.com/settings/profile/"
             target="_blank"
             rel="noreferrer"
             className="text-foreground underline underline-offset-2"
           >
-            your LeetCode profile
-          </a>{" "}
-          and click Edit Profile.
+            LeetCode Profile Settings
+          </a>
+          .
         </li>
-        <li>Paste the code above into your &quot;Summary&quot; / About Me bio.</li>
+        <li>
+          Open <strong className="font-medium text-foreground">ReadMe</strong> under General,
+          paste the code, and save it.
+        </li>
         <li>Save your profile, then come back here and click Verify.</li>
       </ol>
 

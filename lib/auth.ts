@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
 import { prisma } from "@/lib/prisma";
 
 export const auth = betterAuth({
@@ -32,4 +33,7 @@ export const auth = betterAuth({
       leetcodeLastSyncedAt: { type: "date", required: false, input: false },
     },
   },
+  // Must be last: propagates Better Auth's Set-Cookie headers from Server
+  // Actions into Next.js, including forced cookie-cache refreshes.
+  plugins: [nextCookies()],
 });

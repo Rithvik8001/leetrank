@@ -4,7 +4,10 @@ import { getSessionCookie, getCookieCache } from "better-auth/cookies";
 
 const publicRoutes = new Set(["/", "/login", "/signup"]);
 const authOnlyRoutes = new Set(["/login", "/signup"]);
-const onboardingExemptRoutes = new Set(["/onboarding"]);
+// Dashboard performs an authoritative DB-backed onboarding check in its layout.
+// Exempting it also provides a safe landing path if the signed cookie cache is
+// briefly stale immediately after onboarding completes.
+const onboardingExemptRoutes = new Set(["/onboarding", "/dashboard"]);
 
 function isPublicRoute(pathname: string) {
   return publicRoutes.has(pathname) || pathname.startsWith("/users/");
@@ -19,7 +22,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (sessionCookie && authOnlyRoutes.has(pathname)) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   if (

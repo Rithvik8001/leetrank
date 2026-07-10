@@ -70,8 +70,7 @@ export function OnboardingWizard({
         setIsFinishing(false);
         return;
       }
-      router.push("/dashboard");
-      router.refresh();
+      router.replace("/dashboard");
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -113,8 +112,7 @@ export function OnboardingWizard({
         return;
       }
       toast.success("You're verified. Welcome to LeetRank.");
-      router.push("/dashboard");
-      router.refresh();
+      router.replace("/dashboard");
     });
   }
 
@@ -162,7 +160,6 @@ export function OnboardingWizard({
 
       {step === "verify" && code ? (
         <StepVerifyInstructions
-          username={leetcodeUsername ?? ""}
           code={code}
           isPending={isPending}
           onVerify={handleVerify}
