@@ -14,6 +14,8 @@ import {
   type ChallengeFormValues,
 } from "@/lib/challenges/schemas";
 import { getChallengeBaselineForUser } from "@/lib/challenges/queries";
+import { getClubGate } from "@/lib/clubs/auth";
+import { canManageChallenge } from "@/lib/clubs/permissions";
 
 type ActionResult<T = undefined> =
   | ({ ok: true } & (T extends undefined ? object : { data: T }))
@@ -29,6 +31,10 @@ async function requireGroupOwner(groupId: string): Promise<
   | { ok: true; userId: string; group: { id: string; ownerId: string } }
   | { ok: false; error: string }
 > {
+  const gate = await getClubGate(groupId);
+  if (gate && canManageChallenge(gate.group.kind, gate.role) && !gate.group.suspendedAt) {
+    return { ok: true, userId: gate.userId, group: { id: groupId, ownerId: gate.group.ownerId } };
+  }
   const userId = await requireSessionUser();
   if (!userId) return { ok: false, error: "Log in to manage challenges." };
   const group = await prisma.group.findFirst({
@@ -49,7 +55,7 @@ async function requireVerifiedMember(groupId: string): Promise<
     where: {
       id: userId,
       leetcodeVerified: true,
-      groupMemberships: { some: { groupId } },
+      groupMemberships: { some: { groupId, status: "ACTIVE" } },
     },
     select: { id: true },
   });

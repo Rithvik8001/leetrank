@@ -12,6 +12,7 @@ export default function GroupsLayout({ children }: { children: ReactNode }) {
           <Wordmark />
         </Link>
         <div className="flex items-center gap-5">
+          <Link href="/clubs" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Clubs</Link>
           <Link
             href="/dashboard"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"

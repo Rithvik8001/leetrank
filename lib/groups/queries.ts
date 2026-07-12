@@ -27,9 +27,9 @@ export type UserGroupSummary = {
 // Every group the user belongs to (owned or joined), newest first.
 export async function getUserGroups(userId: string): Promise<UserGroupSummary[]> {
   const groups = await prisma.group.findMany({
-    where: { memberships: { some: { userId } } },
+    where: { memberships: { some: { userId, status: "ACTIVE" } } },
     orderBy: { createdAt: "desc" },
-    select: { id: true, name: true, ownerId: true, _count: { select: { memberships: true } } },
+      select: { id: true, name: true, ownerId: true, _count: { select: { memberships: { where: { status: "ACTIVE" } } } } },
   });
   return groups.map((group) => ({
     id: group.id,
@@ -45,6 +45,9 @@ export type GroupForMember = {
   ownerId: string;
   inviteToken: string;
   isOwner: boolean;
+  kind: "CASUAL" | "OFFICIAL_CLUB";
+  slug: string | null;
+  suspendedAt: Date | null;
   members: { id: string; name: string; leetcodeUsername: string | null; isOwner: boolean }[];
 };
 
@@ -55,15 +58,19 @@ export async function getGroupForMember(
   userId: string,
 ): Promise<GroupForMember | null> {
   const group = await prisma.group.findFirst({
-    where: { id: groupId, memberships: { some: { userId } } },
+    where: { id: groupId, memberships: { some: { userId, status: "ACTIVE" } } },
     select: {
       id: true,
       name: true,
       ownerId: true,
       inviteToken: true,
+      kind: true,
+      slug: true,
+      suspendedAt: true,
       memberships: {
+        where: { status: "ACTIVE" },
         orderBy: { createdAt: "asc" },
-        select: { user: { select: { id: true, name: true, leetcodeUsername: true } } },
+        select: { role: true, user: { select: { id: true, name: true, leetcodeUsername: true } } },
       },
     },
   });
@@ -74,6 +81,9 @@ export async function getGroupForMember(
     ownerId: group.ownerId,
     inviteToken: group.inviteToken,
     isOwner: group.ownerId === userId,
+    kind: group.kind,
+    slug: group.slug,
+    suspendedAt: group.suspendedAt,
     members: group.memberships.map((membership) => ({
       id: membership.user.id,
       name: membership.user.name,
@@ -86,7 +96,7 @@ export async function getGroupForMember(
 // Verified members of a group, projected for the leaderboard engine.
 export async function getGroupMembers(groupId: string): Promise<LeaderboardUser[]> {
   return prisma.user.findMany({
-    where: { groupMemberships: { some: { groupId } }, ...VERIFIED_LEADERBOARD_FILTER },
+    where: { groupMemberships: { some: { groupId, status: "ACTIVE" } }, ...VERIFIED_LEADERBOARD_FILTER },
     select: leaderboardUserSelect,
   });
 }
@@ -95,6 +105,7 @@ export type GroupInvitePreview = {
   id: string;
   name: string;
   memberCount: number;
+  kind: "CASUAL" | "OFFICIAL_CLUB";
 };
 
 // Minimal group info resolved from an invite token, for the public join page.
@@ -103,16 +114,16 @@ export async function getGroupByInviteToken(
 ): Promise<GroupInvitePreview | null> {
   const group = await prisma.group.findUnique({
     where: { inviteToken: token },
-    select: { id: true, name: true, _count: { select: { memberships: true } } },
+    select: { id: true, name: true, kind: true, _count: { select: { memberships: { where: { status: "ACTIVE" } } } } },
   });
   if (!group) return null;
-  return { id: group.id, name: group.name, memberCount: group._count.memberships };
+  return { id: group.id, name: group.name, kind: group.kind, memberCount: group._count.memberships };
 }
 
 // Whether the user already belongs to the group (for the join page's CTA state).
 export async function isGroupMember(groupId: string, userId: string): Promise<boolean> {
-  const membership = await prisma.groupMembership.findUnique({
-    where: { groupId_userId: { groupId, userId } },
+  const membership = await prisma.groupMembership.findFirst({
+    where: { groupId, userId, status: "ACTIVE" },
     select: { id: true },
   });
   return membership != null;

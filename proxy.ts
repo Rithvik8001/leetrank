@@ -12,7 +12,9 @@ const onboardingExemptRoutes = new Set(["/onboarding", "/dashboard"]);
 function isPublicRoute(pathname: string) {
   return (
     publicRoutes.has(pathname) ||
-    pathname === "/compare" ||
+  pathname === "/compare" ||
+  pathname === "/clubs" ||
+  pathname.startsWith("/clubs/") ||
     pathname.startsWith("/u/") ||
     pathname.startsWith("/users/") ||
     pathname.startsWith("/groups/join/")

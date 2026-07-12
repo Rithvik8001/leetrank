@@ -20,6 +20,9 @@ import { InviteLink } from "@/components/groups/invite-link";
 import { GroupMembers } from "@/components/groups/group-members";
 import { GroupOwnerControls } from "@/components/groups/group-owner-controls";
 import { GroupChallengeSummary } from "@/components/challenges/group-challenge-summary";
+import { ClubApplicationForm } from "@/components/clubs/club-forms";
+import { prisma } from "@/lib/prisma";
+import { Button } from "@/components/ui/button";
 
 function number(value: number | null, prefix = "") {
   return value == null ? "—" : `${prefix}${value.toLocaleString()}`;
@@ -42,9 +45,10 @@ export default async function GroupLeaderboardPage({
   const group = await getGroupForMember(id, session.user.id);
   if (!group) notFound();
 
-  const [members, challenges] = await Promise.all([
+  const [members, challenges, clubApplication] = await Promise.all([
     getGroupMembers(id),
     getGroupChallengeHighlights(id),
+    prisma.clubApplication.findFirst({ where: { groupId: id }, orderBy: { submittedAt: "desc" }, select: { id: true, status: true, reviewNote: true } }),
   ]);
   const leaderboard = rankLeaderboard(members, sort);
 
@@ -69,10 +73,22 @@ export default async function GroupLeaderboardPage({
               {group.members.length} {group.members.length === 1 ? "member" : "members"}
             </p>
           </div>
-          {group.isOwner ? <GroupOwnerControls groupId={group.id} currentName={group.name} /> : null}
+          {group.isOwner && group.kind === "CASUAL" ? <GroupOwnerControls groupId={group.id} currentName={group.name} /> : null}
         </div>
-        <InviteLink inviteUrl={inviteUrl} groupId={group.id} isOwner={group.isOwner} />
+        {group.kind === "CASUAL" ? <InviteLink inviteUrl={inviteUrl} groupId={group.id} isOwner={group.isOwner} /> : (
+          <nav className="flex flex-wrap gap-2">
+            {group.slug ? <Button nativeButton={false} variant="outline" render={<Link href={`/clubs/${group.slug}`} />}>Public page</Button> : null}
+            <Button nativeButton={false} variant="outline" render={<Link href={`/groups/${group.id}/announcements`} />}>Announcements</Button>
+            <Button nativeButton={false} render={<Link href={`/groups/${group.id}/admin`} />}>Club admin</Button>
+          </nav>
+        )}
       </header>
+
+      {group.isOwner && group.kind === "CASUAL" ? (
+        <section>
+          {clubApplication ? <div className="border-l-2 border-gold pl-4 text-sm"><p className="font-mono text-xs text-gold uppercase">Official club application · {clubApplication.status}</p>{clubApplication.reviewNote ? <p className="mt-2 text-muted-foreground">{clubApplication.reviewNote}</p> : null}</div> : <ClubApplicationForm groupId={group.id} />}
+        </section>
+      ) : null}
 
       <GroupChallengeSummary groupId={group.id} challenges={challenges} />
 

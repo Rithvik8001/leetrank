@@ -224,7 +224,7 @@ export async function getGroupChallengesForMember(
   now = new Date(),
 ): Promise<GroupChallengesForMember | null> {
   const group = await prisma.group.findFirst({
-    where: { id: groupId, memberships: { some: { userId } } },
+    where: { id: groupId, memberships: { some: { userId, status: "ACTIVE" } } },
     select: { id: true, name: true, ownerId: true },
   });
   if (!group) return null;
@@ -278,7 +278,7 @@ export async function getChallengeForMember(
   now = new Date(),
 ): Promise<ChallengeDetail | null> {
   const group = await prisma.group.findFirst({
-    where: { id: groupId, memberships: { some: { userId } } },
+    where: { id: groupId, memberships: { some: { userId, status: "ACTIVE" } } },
     select: { id: true, name: true, ownerId: true },
   });
   if (!group) return null;

@@ -30,18 +30,26 @@ async function requireVerifiedUser(): Promise<
   return { ok: true, userId: user.id };
 }
 
-export async function createGroup(name: string): Promise<ActionResult<{ id: string }>> {
+export async function createGroup(
+  name: string,
+): Promise<ActionResult<{ id: string }>> {
   const gate = await requireVerifiedUser();
   if (!gate.ok) return gate;
 
   const parsed = groupNameSchema.safeParse({ name });
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid group name" };
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Invalid group name",
+    };
   }
 
   const owned = await prisma.group.count({ where: { ownerId: gate.userId } });
   if (owned >= MAX_OWNED_GROUPS) {
-    return { ok: false, error: `You can own up to ${MAX_OWNED_GROUPS} groups.` };
+    return {
+      ok: false,
+      error: `You can own up to ${MAX_OWNED_GROUPS} groups.`,
+    };
   }
 
   const group = await prisma.group.create({
@@ -50,7 +58,9 @@ export async function createGroup(name: string): Promise<ActionResult<{ id: stri
       name: parsed.data.name,
       ownerId: gate.userId,
       inviteToken: generateInviteToken(),
-      memberships: { create: { id: crypto.randomUUID(), userId: gate.userId } },
+      memberships: {
+        create: { id: crypto.randomUUID(), userId: gate.userId, role: "OWNER" },
+      },
     },
     select: { id: true },
   });
@@ -59,35 +69,58 @@ export async function createGroup(name: string): Promise<ActionResult<{ id: stri
   return { ok: true, data: { id: group.id } };
 }
 
-export async function joinGroup(token: string): Promise<ActionResult<{ id: string }>> {
+export async function joinGroup(
+  token: string,
+): Promise<ActionResult<{ id: string }>> {
   const gate = await requireVerifiedUser();
   if (!gate.ok) return gate;
 
   const group = await prisma.group.findUnique({
     where: { inviteToken: token },
-    select: { id: true, _count: { select: { memberships: true } } },
+    select: {
+      id: true,
+      kind: true,
+      _count: { select: { memberships: { where: { status: "ACTIVE" } } } },
+    },
   });
   if (!group) {
     return { ok: false, error: "That invite link is no longer valid." };
   }
+  if (group.kind === "OFFICIAL_CLUB")
+    return { ok: false, error: "Official clubs use membership applications." };
 
   const already = await prisma.groupMembership.findUnique({
     where: { groupId_userId: { groupId: group.id, userId: gate.userId } },
-    select: { id: true },
+    select: { id: true, status: true },
   });
-  if (already) return { ok: true, data: { id: group.id } };
+  if (already?.status === "ACTIVE") return { ok: true, data: { id: group.id } };
 
   if (group._count.memberships >= MAX_GROUP_MEMBERS) {
     return { ok: false, error: "This group is full." };
   }
 
   try {
-    await prisma.groupMembership.create({
-      data: { id: crypto.randomUUID(), groupId: group.id, userId: gate.userId },
+    await prisma.groupMembership.upsert({
+      where: { groupId_userId: { groupId: group.id, userId: gate.userId } },
+      create: {
+        id: crypto.randomUUID(),
+        groupId: group.id,
+        userId: gate.userId,
+      },
+      update: {
+        status: "ACTIVE",
+        role: "MEMBER",
+        endedAt: null,
+        removalReason: null,
+        removedById: null,
+        createdAt: new Date(),
+      },
     });
   } catch (error) {
     // Unique-constraint race → treat as already a member.
-    if (!(error instanceof Error && error.message.includes("Unique constraint"))) {
+    if (!(
+      error instanceof Error && error.message.includes("Unique constraint")
+    )) {
       throw error;
     }
   }
@@ -107,11 +140,15 @@ export async function leaveGroup(groupId: string): Promise<ActionResult> {
   });
   if (!group) return { ok: false, error: "That group no longer exists." };
   if (group.ownerId === gate.userId) {
-    return { ok: false, error: "Owners can't leave — delete the group instead." };
+    return {
+      ok: false,
+      error: "Owners can't leave — delete the group instead.",
+    };
   }
 
-  await prisma.groupMembership.deleteMany({
-    where: { groupId, userId: gate.userId },
+  await prisma.groupMembership.updateMany({
+    where: { groupId, userId: gate.userId, status: "ACTIVE" },
+    data: { status: "LEFT", endedAt: new Date() },
   });
 
   revalidatePath("/groups");
@@ -146,7 +183,15 @@ export async function removeMember(
     return { ok: false, error: "You can't remove yourself as the owner." };
   }
 
-  await prisma.groupMembership.deleteMany({ where: { groupId, userId } });
+  await prisma.groupMembership.updateMany({
+    where: { groupId, userId, status: "ACTIVE" },
+    data: {
+      status: "REMOVED",
+      endedAt: new Date(),
+      removedById: owner.userId,
+      removalReason: "Removed by group owner",
+    },
+  });
 
   revalidatePath(`/groups/${groupId}`);
   return { ok: true };
@@ -161,10 +206,25 @@ export async function renameGroup(
 
   const parsed = groupNameSchema.safeParse({ name });
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid group name" };
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Invalid group name",
+    };
   }
 
-  await prisma.group.update({ where: { id: groupId }, data: { name: parsed.data.name } });
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { kind: true },
+  });
+  if (group?.kind === "OFFICIAL_CLUB")
+    return {
+      ok: false,
+      error: "Edit official club details from the admin dashboard.",
+    };
+  await prisma.group.update({
+    where: { id: groupId },
+    data: { name: parsed.data.name },
+  });
 
   revalidatePath("/groups");
   revalidatePath(`/groups/${groupId}`);
@@ -177,8 +237,17 @@ export async function regenerateInvite(
   const owner = await requireOwner(groupId);
   if (!owner.ok) return owner;
 
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { kind: true },
+  });
+  if (group?.kind === "OFFICIAL_CLUB")
+    return { ok: false, error: "Official clubs use membership applications." };
   const token = generateInviteToken();
-  await prisma.group.update({ where: { id: groupId }, data: { inviteToken: token } });
+  await prisma.group.update({
+    where: { id: groupId },
+    data: { inviteToken: token },
+  });
 
   revalidatePath(`/groups/${groupId}`);
   return { ok: true, data: { token } };

@@ -42,7 +42,7 @@ export default async function UniversityProfilePage({
   const university = await prisma.university.findUnique({ where: { slug } });
   if (!university) notFound();
 
-  const users = await prisma.user.findMany({
+  const [users, officialClubs] = await Promise.all([prisma.user.findMany({
     where: { universityId: university.id, ...VERIFIED_LEADERBOARD_FILTER },
     select: {
       id: true,
@@ -58,7 +58,7 @@ export default async function UniversityProfilePage({
       publicProfileEnabled: true,
       publicProfileHandle: true,
     },
-  });
+  }), prisma.group.findMany({ where: { universityId: university.id, kind: "OFFICIAL_CLUB", suspendedAt: null }, orderBy: { name: "asc" }, select: { id: true, name: true, slug: true, description: true, _count: { select: { memberships: { where: { status: "ACTIVE" } } } } } })]);
   const leaderboard = rankLeaderboard(users, sort);
   const [insights, activity] = await Promise.all([
     getUniversityInsights(university.id, users),
@@ -81,6 +81,20 @@ export default async function UniversityProfilePage({
           {university.website ? <><span aria-hidden="true">·</span><a href={university.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-foreground underline decoration-gold decoration-2 underline-offset-4"><HugeiconsIcon icon={Globe02Icon} strokeWidth={2} className="size-3.5" />{university.website.replace(/^https?:\/\//, "")}</a></> : null}
         </div>
       </header>
+
+      {officialClubs.length ? (
+        <section>
+          <SectionLabel>Official clubs</SectionLabel>
+          <div className="mt-4 divide-y divide-border border border-border">
+            {officialClubs.map((club) => (
+              <Link key={club.id} href={`/clubs/${club.slug}`} className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-muted">
+                <div><p className="text-sm font-medium">{club.name}</p><p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{club.description}</p></div>
+                <span className="shrink-0 font-mono text-xs text-muted-foreground">{club._count.memberships} members</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {leaderboard.length ? <UniversityInsights data={insights} /> : null}
 

@@ -52,6 +52,13 @@ model User {
   groupMemberships GroupMembership[]
   createdChallenges GroupChallenge[] @relation("ChallengeCreator")
   challengeParticipations ChallengeParticipant[]
+  platformRole PlatformRole @default(USER)
+  submittedClubApplications ClubApplication[] @relation("ClubApplicationSubmitter")
+  reviewedClubApplications ClubApplication[] @relation("ClubApplicationReviewer")
+  clubMembershipApplications ClubMembershipApplication[] @relation("ClubMembershipApplicant")
+  reviewedMembershipApplications ClubMembershipApplication[] @relation("ClubMembershipReviewer")
+  clubAnnouncements ClubAnnouncement[]
+  auditEvents AuditEvent[]
 
   @@unique([email])
   @@unique([leetcodeUsername])
@@ -113,6 +120,50 @@ enum ChallengeBaselineKind {
   @@map("challenge_baseline_kind")
 }
 
+enum PlatformRole {
+  USER
+  ADMIN
+}
+
+enum GroupKind {
+  CASUAL
+  OFFICIAL_CLUB
+}
+
+enum GroupRole {
+  OWNER
+  ADMIN
+  OFFICER
+  MEMBER
+}
+
+enum MembershipStatus {
+  ACTIVE
+  REMOVED
+  LEFT
+  BLOCKED
+}
+
+enum ClubApplicationStatus {
+  PENDING
+  CHANGES_REQUESTED
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ClubMembershipApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+enum AnnouncementVisibility {
+  PUBLIC
+  MEMBERS
+}
+
 model University {
   id            String         @id
   unitId        String?
@@ -125,6 +176,8 @@ model University {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   users         User[]
+  groups        Group[]
+  clubApplications ClubApplication[]
 
   @@unique([slug])
   @@unique([unitId])
@@ -142,8 +195,27 @@ model Group {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  kind             GroupKind @default(CASUAL)
+  universityId     String?
+  university       University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  slug             String? @unique
+  description      String?
+  contactEmail     String?
+  websiteUrl       String?
+  discordUrl       String?
+  githubUrl        String?
+  logoUrl          String?
+  approvedAt       DateTime?
+  approvedById     String?
+  suspendedAt      DateTime?
+  suspensionReason String?
+
   memberships GroupMembership[]
   challenges   GroupChallenge[]
+  clubApplications ClubApplication[]
+  membershipApplications ClubMembershipApplication[]
+  announcements ClubAnnouncement[]
+  auditEvents AuditEvent[]
 
   @@unique([inviteToken])
   @@index([ownerId])
@@ -202,10 +274,105 @@ model GroupMembership {
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+  role GroupRole @default(MEMBER)
+  status MembershipStatus @default(ACTIVE)
+  publicOfficerVisible Boolean @default(true)
+  endedAt DateTime?
+  removedById String?
+  removalReason String?
 
   @@unique([groupId, userId])
   @@index([userId])
   @@map("group_membership")
+}
+
+model ClubApplication {
+  id String @id
+  groupId String
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  submittedById String
+  submittedBy User @relation("ClubApplicationSubmitter", fields: [submittedById], references: [id], onDelete: Cascade)
+  universityId String
+  university University @relation(fields: [universityId], references: [id], onDelete: Restrict)
+  status ClubApplicationStatus @default(PENDING)
+  proposedName String
+  requestedSlug String
+  description String
+  officialWebsiteUrl String
+  facultyAdvisorName String
+  facultyAdvisorEmail String
+  contactEmail String
+  githubUrl String?
+  discordUrl String?
+  evidenceNote String
+  submittedAt DateTime @default(now())
+  reviewedAt DateTime?
+  reviewedById String?
+  reviewedBy User? @relation("ClubApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupId, status])
+  @@index([status, submittedAt])
+  @@index([requestedSlug])
+  @@map("club_application")
+}
+
+model ClubMembershipApplication {
+  id String @id
+  groupId String
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation("ClubMembershipApplicant", fields: [userId], references: [id], onDelete: Cascade)
+  status ClubMembershipApplicationStatus @default(PENDING)
+  message String?
+  submittedAt DateTime @default(now())
+  reviewedAt DateTime?
+  reviewedById String?
+  reviewedBy User? @relation("ClubMembershipReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNote String?
+  withdrawnAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupId, status, submittedAt])
+  @@index([userId, groupId, submittedAt])
+  @@map("club_membership_application")
+}
+
+model ClubAnnouncement {
+  id String @id
+  groupId String
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  authorId String
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title String
+  body String
+  visibility AnnouncementVisibility
+  publishedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  archivedAt DateTime?
+
+  @@index([groupId, visibility, publishedAt])
+  @@map("club_announcement")
+}
+
+model AuditEvent {
+  id String @id
+  actorId String
+  actor User @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  groupId String?
+  group Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  action String
+  targetType String
+  targetId String?
+  metadata Json?
+  createdAt DateTime @default(now())
+
+  @@index([groupId, createdAt])
+  @@index([actorId, createdAt])
+  @@map("audit_event")
 }
 
 model Session {
