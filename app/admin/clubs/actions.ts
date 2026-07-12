@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { requirePlatformAdmin } from "@/lib/clubs/auth";
 import { recordAudit } from "@/lib/clubs/audit";
 import { reviewSchema } from "@/lib/clubs/schemas";
+import { buildNotification } from "@/lib/notifications/copy";
+import { recordNotification } from "@/lib/notifications/create";
 
 type Result = { ok: true } | { ok: false; error: string };
 const fail = (error: string): Result => ({ ok: false, error });
@@ -106,6 +108,28 @@ export async function reviewClubApplication(
       action: `club.application.${decision.toLowerCase()}`,
       targetType: "ClubApplication",
       targetId: applicationId,
+    });
+    const payload =
+      decision === "APPROVED"
+        ? buildNotification({
+            kind: "CLUB_APPLICATION_APPROVED",
+            groupId: application.groupId,
+            clubName: application.proposedName,
+            slug: application.requestedSlug,
+          })
+        : buildNotification({
+            kind:
+              decision === "REJECTED"
+                ? "CLUB_APPLICATION_REJECTED"
+                : "CLUB_APPLICATION_CHANGES_REQUESTED",
+            groupId: application.groupId,
+            clubName: application.proposedName,
+            note: note || null,
+          });
+    await recordNotification(tx, {
+      ...payload,
+      recipientId: application.group.ownerId,
+      actorId: admin.id,
     });
   });
   refresh(

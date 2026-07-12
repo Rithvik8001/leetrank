@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { todayUtcDate } from "@/lib/challenges/dates";
 import { buildChallengeStandings } from "@/lib/challenges/queries";
 import type { ChallengeMetricValue } from "@/lib/challenges/constants";
+import { buildNotification } from "@/lib/notifications/copy";
+import { recordNotification } from "@/lib/notifications/create";
 
 export async function finalizeEndedChallenges(now = new Date()) {
   const today = todayUtcDate(now);
@@ -12,6 +14,8 @@ export async function finalizeEndedChallenges(now = new Date()) {
     },
     select: {
       id: true,
+      groupId: true,
+      title: true,
       metric: true,
       startsOn: true,
       endsOn: true,
@@ -59,13 +63,25 @@ export async function finalizeEndedChallenges(now = new Date()) {
     );
 
     for (const row of standings) {
-      await prisma.challengeParticipant.update({
-        where: { id: row.id },
-        data: {
-          finalMetricValue: row.currentValue,
-          finalDelta: row.delta,
-          finalizedAt: now,
-        },
+      await prisma.$transaction(async (tx) => {
+        await tx.challengeParticipant.update({
+          where: { id: row.id },
+          data: {
+            finalMetricValue: row.currentValue,
+            finalDelta: row.delta,
+            finalizedAt: now,
+          },
+        });
+        await recordNotification(tx, {
+          ...buildNotification({
+            kind: "CHALLENGE_FINISHED",
+            groupId: challenge.groupId,
+            challengeId: challenge.id,
+            challengeTitle: challenge.title,
+            finalDelta: row.delta,
+          }),
+          recipientId: row.userId,
+        });
       });
       finalized += 1;
     }

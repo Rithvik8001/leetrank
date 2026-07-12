@@ -16,6 +16,8 @@ import {
 import { getChallengeBaselineForUser } from "@/lib/challenges/queries";
 import { getClubGate } from "@/lib/clubs/auth";
 import { canManageChallenge } from "@/lib/clubs/permissions";
+import { buildNotification } from "@/lib/notifications/copy";
+import { recordNotifications } from "@/lib/notifications/create";
 
 type ActionResult<T = undefined> =
   | ({ ok: true } & (T extends undefined ? object : { data: T }))
@@ -108,18 +110,36 @@ export async function createGroupChallenge(
     };
   }
 
-  const challenge = await prisma.groupChallenge.create({
-    data: {
-      id: crypto.randomUUID(),
-      groupId,
-      createdById: owner.userId,
-      title: parsed.values.title,
-      description: parsed.values.description,
-      metric: parsed.values.metric,
-      startsOn: parsed.startsOn,
-      endsOn: parsed.endsOn,
-    },
-    select: { id: true },
+  const members = await prisma.groupMembership.findMany({
+    where: { groupId, status: "ACTIVE", user: { leetcodeVerified: true } },
+    select: { userId: true },
+  });
+
+  const challenge = await prisma.$transaction(async (tx) => {
+    const created = await tx.groupChallenge.create({
+      data: {
+        id: crypto.randomUUID(),
+        groupId,
+        createdById: owner.userId,
+        title: parsed.values.title,
+        description: parsed.values.description,
+        metric: parsed.values.metric,
+        startsOn: parsed.startsOn,
+        endsOn: parsed.endsOn,
+      },
+      select: { id: true },
+    });
+    await recordNotifications(tx, {
+      ...buildNotification({
+        kind: "CHALLENGE_CREATED",
+        groupId,
+        challengeId: created.id,
+        challengeTitle: parsed.values.title,
+      }),
+      recipientIds: members.map((m) => m.userId),
+      actorId: owner.userId,
+    });
+    return created;
   });
 
   revalidateChallengePaths(groupId, challenge.id);

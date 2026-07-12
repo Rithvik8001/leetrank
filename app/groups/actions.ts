@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { groupNameSchema } from "@/lib/groups/schemas";
 import { generateInviteToken } from "@/lib/groups/invite-token";
 import { MAX_GROUP_MEMBERS, MAX_OWNED_GROUPS } from "@/lib/groups/constants";
+import { buildNotification } from "@/lib/notifications/copy";
+import { recordNotification } from "@/lib/notifications/create";
 
 type ActionResult<T = undefined> =
   | ({ ok: true } & (T extends undefined ? object : { data: T }))
@@ -79,7 +81,9 @@ export async function joinGroup(
     where: { inviteToken: token },
     select: {
       id: true,
+      name: true,
       kind: true,
+      ownerId: true,
       _count: { select: { memberships: { where: { status: "ACTIVE" } } } },
     },
   });
@@ -99,6 +103,11 @@ export async function joinGroup(
     return { ok: false, error: "This group is full." };
   }
 
+  const member = await prisma.user.findUnique({
+    where: { id: gate.userId },
+    select: { name: true },
+  });
+
   try {
     await prisma.groupMembership.upsert({
       where: { groupId_userId: { groupId: group.id, userId: gate.userId } },
@@ -115,6 +124,16 @@ export async function joinGroup(
         removedById: null,
         createdAt: new Date(),
       },
+    });
+    await recordNotification(prisma, {
+      ...buildNotification({
+        kind: "GROUP_MEMBER_JOINED",
+        groupId: group.id,
+        groupName: group.name,
+        memberName: member?.name ?? "A new member",
+      }),
+      recipientId: group.ownerId,
+      actorId: gate.userId,
     });
   } catch (error) {
     // Unique-constraint race → treat as already a member.
@@ -183,14 +202,32 @@ export async function removeMember(
     return { ok: false, error: "You can't remove yourself as the owner." };
   }
 
-  await prisma.groupMembership.updateMany({
-    where: { groupId, userId, status: "ACTIVE" },
-    data: {
-      status: "REMOVED",
-      endedAt: new Date(),
-      removedById: owner.userId,
-      removalReason: "Removed by group owner",
-    },
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { name: true },
+  });
+
+  await prisma.$transaction(async (tx) => {
+    const changed = await tx.groupMembership.updateMany({
+      where: { groupId, userId, status: "ACTIVE" },
+      data: {
+        status: "REMOVED",
+        endedAt: new Date(),
+        removedById: owner.userId,
+        removalReason: "Removed by group owner",
+      },
+    });
+    if (changed.count && group) {
+      await recordNotification(tx, {
+        ...buildNotification({
+          kind: "GROUP_MEMBER_REMOVED",
+          groupId,
+          groupName: group.name,
+        }),
+        recipientId: userId,
+        actorId: owner.userId,
+      });
+    }
   });
 
   revalidatePath(`/groups/${groupId}`);

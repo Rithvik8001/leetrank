@@ -5,6 +5,8 @@ import type { GroupRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getClubGate, getCurrentDbUser } from "@/lib/clubs/auth";
 import { recordAudit } from "@/lib/clubs/audit";
+import { buildNotification } from "@/lib/notifications/copy";
+import { recordNotification, recordNotifications } from "@/lib/notifications/create";
 import {
   canAdminClub,
   canChangeRole,
@@ -222,6 +224,7 @@ export async function decideClubMember(
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     select: {
+      name: true,
       universityId: true,
       suspendedAt: true,
       slug: true,
@@ -271,6 +274,26 @@ export async function decideClubMember(
       targetId: applicationId,
       metadata: { userId: application.userId },
     });
+    const payload =
+      decision === "APPROVED"
+        ? buildNotification({
+            kind: "CLUB_MEMBERSHIP_APPROVED",
+            groupId,
+            clubName: group.name,
+            slug: group.slug ?? "",
+          })
+        : buildNotification({
+            kind: "CLUB_MEMBERSHIP_REJECTED",
+            groupId,
+            clubName: group.name,
+            slug: group.slug ?? "",
+            note: parsed.data.note || null,
+          });
+    await recordNotification(tx, {
+      ...payload,
+      recipientId: application.userId,
+      actorId: gate.userId,
+    });
   });
   refresh(groupId, group.slug);
   return { ok: true };
@@ -286,7 +309,7 @@ export async function changeClubMemberRole(
   if (gate.group.suspendedAt) return err("This club is suspended.");
   const member = await prisma.groupMembership.findUnique({
     where: { groupId_userId: { groupId, userId } },
-    select: { role: true, status: true },
+    select: { role: true, status: true, group: { select: { name: true } } },
   });
   if (
     !member ||
@@ -306,6 +329,17 @@ export async function changeClubMemberRole(
       targetType: "User",
       targetId: userId,
       metadata: { from: member.role, to: role },
+    });
+    await recordNotification(tx, {
+      ...buildNotification({
+        kind: "CLUB_ROLE_CHANGED",
+        groupId,
+        clubName: member.group.name,
+        slug: gate.group.slug ?? "",
+        role,
+      }),
+      recipientId: userId,
+      actorId: gate.userId,
     });
   });
   refresh(groupId, gate.group.slug);
@@ -327,8 +361,12 @@ export async function removeClubMember(
   const parsed = memberRemovalSchema.safeParse({ reason });
   if (!parsed.success)
     return err(parsed.error.issues[0]?.message ?? "Give a reason.");
+  const club = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: { name: true },
+  });
   await prisma.$transaction(async (tx) => {
-    await tx.groupMembership.updateMany({
+    const changed = await tx.groupMembership.updateMany({
       where: { groupId, userId, status: "ACTIVE", role: { not: "OWNER" } },
       data: {
         status: block ? "BLOCKED" : "REMOVED",
@@ -344,6 +382,18 @@ export async function removeClubMember(
       targetType: "User",
       targetId: userId,
     });
+    if (changed.count && club) {
+      await recordNotification(tx, {
+        ...buildNotification({
+          kind: "CLUB_MEMBER_REMOVED",
+          groupId,
+          clubName: club.name,
+          blocked: block,
+        }),
+        recipientId: userId,
+        actorId: gate.userId,
+      });
+    }
   });
   refresh(groupId, gate.group.slug);
   return { ok: true };
@@ -395,6 +445,16 @@ export async function createClubAnnouncement(
   const parsed = announcementSchema.safeParse(values);
   if (!parsed.success)
     return err(parsed.error.issues[0]?.message ?? "Invalid announcement.");
+  const club = await prisma.group.findUnique({
+    where: { id: groupId },
+    select: {
+      name: true,
+      memberships: {
+        where: { status: "ACTIVE" },
+        select: { userId: true },
+      },
+    },
+  });
   await prisma.$transaction(async (tx) => {
     const item = await tx.clubAnnouncement.create({
       data: {
@@ -411,6 +471,20 @@ export async function createClubAnnouncement(
       targetType: "ClubAnnouncement",
       targetId: item.id,
     });
+    if (club) {
+      await recordNotifications(tx, {
+        ...buildNotification({
+          kind: "CLUB_ANNOUNCEMENT_PUBLISHED",
+          groupId,
+          clubName: club.name,
+          slug: gate.group.slug ?? "",
+          announcementId: item.id,
+          announcementTitle: parsed.data.title,
+        }),
+        recipientIds: club.memberships.map((m) => m.userId),
+        actorId: gate.userId,
+      });
+    }
   });
   refresh(groupId, gate.group.slug);
   return { ok: true };
