@@ -50,6 +50,8 @@ model User {
 
   ownedGroups      Group[]           @relation("GroupOwner")
   groupMemberships GroupMembership[]
+  createdChallenges GroupChallenge[] @relation("ChallengeCreator")
+  challengeParticipations ChallengeParticipant[]
 
   @@unique([email])
   @@unique([leetcodeUsername])
@@ -95,6 +97,22 @@ enum OwnershipType {
   @@map("ownership_type")
 }
 
+enum ChallengeMetric {
+  TOTAL_SOLVED
+  HARD_SOLVED
+  CONTEST_RATING
+
+  @@map("challenge_metric")
+}
+
+enum ChallengeBaselineKind {
+  START_SNAPSHOT
+  JOIN_FALLBACK
+  PENDING
+
+  @@map("challenge_baseline_kind")
+}
+
 model University {
   id            String         @id
   unitId        String?
@@ -125,10 +143,55 @@ model Group {
   updatedAt   DateTime @updatedAt
 
   memberships GroupMembership[]
+  challenges   GroupChallenge[]
 
   @@unique([inviteToken])
   @@index([ownerId])
   @@map("group")
+}
+
+model GroupChallenge {
+  id          String          @id
+  groupId     String
+  group       Group           @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User            @relation("ChallengeCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  metric      ChallengeMetric
+  startsOn    DateTime        @db.Date
+  endsOn      DateTime        @db.Date
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  participants ChallengeParticipant[]
+
+  @@index([groupId, startsOn])
+  @@index([groupId, endsOn])
+  @@map("group_challenge")
+}
+
+model ChallengeParticipant {
+  id          String         @id
+  challengeId String
+  challenge   GroupChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt    DateTime       @default(now())
+
+  baselineKind          ChallengeBaselineKind @default(PENDING)
+  baselineTotalSolved   Int?
+  baselineHardSolved    Int?
+  baselineContestRating Float?
+  baselineCapturedAt    DateTime?
+
+  finalMetricValue Float?
+  finalDelta       Float?
+  finalizedAt      DateTime?
+
+  @@unique([challengeId, userId])
+  @@index([userId])
+  @@map("challenge_participant")
 }
 
 model GroupMembership {

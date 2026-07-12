@@ -11,6 +11,7 @@ import {
   rankLeaderboard,
 } from "@/lib/leaderboard";
 import { getGroupForMember, getGroupMembers } from "@/lib/groups/queries";
+import { getGroupChallengeHighlights } from "@/lib/challenges/queries";
 import { cn } from "@/lib/utils";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { SectionLabel } from "@/components/marketing/section-label";
@@ -18,6 +19,7 @@ import { LiveTag } from "@/components/standings";
 import { InviteLink } from "@/components/groups/invite-link";
 import { GroupMembers } from "@/components/groups/group-members";
 import { GroupOwnerControls } from "@/components/groups/group-owner-controls";
+import { GroupChallengeSummary } from "@/components/challenges/group-challenge-summary";
 
 function number(value: number | null, prefix = "") {
   return value == null ? "—" : `${prefix}${value.toLocaleString()}`;
@@ -40,7 +42,10 @@ export default async function GroupLeaderboardPage({
   const group = await getGroupForMember(id, session.user.id);
   if (!group) notFound();
 
-  const members = await getGroupMembers(id);
+  const [members, challenges] = await Promise.all([
+    getGroupMembers(id),
+    getGroupChallengeHighlights(id),
+  ]);
   const leaderboard = rankLeaderboard(members, sort);
 
   const requestHeaders = await headers();
@@ -68,6 +73,8 @@ export default async function GroupLeaderboardPage({
         </div>
         <InviteLink inviteUrl={inviteUrl} groupId={group.id} isOwner={group.isOwner} />
       </header>
+
+      <GroupChallengeSummary groupId={group.id} challenges={challenges} />
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-1 rounded-md border border-border bg-muted/20 p-1" aria-label="Leaderboard sort">

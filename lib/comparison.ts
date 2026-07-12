@@ -10,7 +10,9 @@ export type DifficultyCounts = {
 
 export type DifficultyDistribution = Record<Difficulty, number>;
 
-export function difficultyDistribution(counts: DifficultyCounts): DifficultyDistribution | null {
+export function difficultyDistribution(
+  counts: DifficultyCounts,
+): DifficultyDistribution | null {
   if (counts.total == null || counts.total <= 0) return null;
   return {
     Easy: ((counts.easy ?? 0) / counts.total) * 100,
