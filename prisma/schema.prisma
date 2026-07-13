@@ -468,3 +468,17 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+// Fixed-window rate-limit counters. Shared by Better Auth's
+// `storage: "database"` limiter (keys are request paths, e.g. "/sign-in")
+// and the app's `lib/rate-limit.ts` helper (keys prefixed "rl:"). One row
+// per key; `lastRequest` is epoch ms (Better Auth writes a JS number, so
+// the column must be BigInt to fit a millisecond timestamp).
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rate_limit")
+}

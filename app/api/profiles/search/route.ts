@@ -1,5 +1,10 @@
 import { auth } from "@/lib/auth";
 import {
+  consumeRateLimit,
+  getClientIp,
+  PROFILE_SEARCH,
+} from "@/lib/rate-limit";
+import {
   normalizeProfileSearchQuery,
   PROFILE_SEARCH_MIN_LENGTH,
   searchComparableProfiles,
@@ -19,6 +24,22 @@ export async function GET(request: Request) {
 
   try {
     const session = await auth.api.getSession({ headers: request.headers });
+
+    const identity = session?.user.id ?? getClientIp(request.headers);
+    const limit = await consumeRateLimit(`search:${identity}`, PROFILE_SEARCH);
+    if (!limit.allowed) {
+      return Response.json(
+        { error: "Too many searches. Slow down and try again shortly." },
+        {
+          status: 429,
+          headers: {
+            ...RESPONSE_HEADERS,
+            "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)),
+          },
+        },
+      );
+    }
+
     const results = await searchComparableProfiles(query, !session);
     return Response.json({ results }, { headers: RESPONSE_HEADERS });
   } catch {

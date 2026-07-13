@@ -20,6 +20,11 @@ import {
   LeetCodeFetchError,
 } from "@/lib/leetcode";
 import { profileStatsData, recordDailySnapshot } from "@/lib/leetcode-sync";
+import {
+  consumeRateLimit,
+  GENERATE_CODE,
+  VERIFY_BIO,
+} from "@/lib/rate-limit";
 import { normalizePublicHandle } from "@/lib/users/profiles";
 import { LeetcodeSyncStatus } from "@prisma/client";
 
@@ -70,6 +75,14 @@ export async function setLeetcodeUsernameAndGenerateCode(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid username" };
   }
 
+  const limit = await consumeRateLimit(`code:${session.user.id}`, GENERATE_CODE);
+  if (!limit.allowed) {
+    return {
+      ok: false,
+      error: "You're generating codes too quickly. Try again in a few minutes.",
+    };
+  }
+
   const existing = await prisma.user.findUnique({
     where: { leetcodeUsername: parsed.data.username },
   });
@@ -112,6 +125,14 @@ export async function verifyLeetcodeBio(): Promise<ActionResult> {
     return {
       ok: false,
       error: "Your verification code expired. Generate a new one.",
+    };
+  }
+
+  const limit = await consumeRateLimit(`verify:${session.user.id}`, VERIFY_BIO);
+  if (!limit.allowed) {
+    return {
+      ok: false,
+      error: "Too many verification attempts. Try again in a few minutes.",
     };
   }
 
