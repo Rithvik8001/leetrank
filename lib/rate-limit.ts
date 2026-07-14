@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { logEvent } from "@/lib/observability";
 
 // Fixed-window rate limiting backed by the shared `RateLimit` Postgres table
 // (see prisma/schema.prisma). Keys written here are prefixed "rl:" so they
@@ -111,7 +112,10 @@ export async function consumeRateLimit(
       remaining: Math.max(0, rule.max - row.count),
     };
   } catch (error) {
-    console.warn(`Rate limit check failed for ${fullKey}:`, error);
+    logEvent("warn", "rate_limit.store_failed", {
+      key: fullKey,
+      error: error instanceof Error ? error.message : "Unknown database error",
+    });
     return { allowed: true, retryAfterMs: 0, remaining: rule.max - 1 };
   }
 }

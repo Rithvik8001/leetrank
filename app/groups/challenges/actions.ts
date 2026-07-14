@@ -138,6 +138,7 @@ export async function createGroupChallenge(
       }),
       recipientIds: members.map((m) => m.userId),
       actorId: owner.userId,
+      eventKey: `challenge:${created.id}:created`,
     });
     return created;
   });

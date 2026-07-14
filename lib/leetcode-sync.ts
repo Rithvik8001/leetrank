@@ -19,6 +19,10 @@ export type SyncResult =
   | { ok: false; kind: "already_pending"; error: string }
   | { ok: false; kind: "failed"; error: string };
 
+export type ScheduledSyncResult =
+  | { ok: true; kind: "success" | "skipped" }
+  | { ok: false; kind: "transient" | "permanent"; code: string; error: string };
+
 export function syncAvailability(
   status: LeetcodeSyncStatus,
   lastAttemptAt: Date | null,
@@ -188,25 +192,71 @@ export async function syncVerifiedUserStats(
   }
 }
 
-// Batch sync for the daily cron. Sequential + paced to respect LeetCode's
-// unofficial GraphQL endpoint; a per-user failure never aborts the batch.
-export async function syncAllVerifiedUsers(now = new Date()) {
-  const users = await prisma.user.findMany({
-    where: { leetcodeVerified: true, leetcodeUsername: { not: null } },
-    select: { id: true },
+export async function syncScheduledUserStats(
+  userId: string,
+  scheduledFor: Date,
+  now = new Date(),
+): Promise<ScheduledSyncResult> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      leetcodeUsername: true,
+      leetcodeVerified: true,
+      leetcodeSyncStatus: true,
+      leetcodeLastSyncedAt: true,
+    },
   });
-
-  let ok = 0;
-  let failed = 0;
-  for (const user of users) {
-    const result = await syncVerifiedUserStats(user.id, now);
-    if (result.ok) {
-      ok += 1;
-    } else {
-      failed += 1;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 750));
+  if (!user?.leetcodeVerified || !user.leetcodeUsername) {
+    return { ok: true, kind: "skipped" };
+  }
+  if (
+    user.leetcodeSyncStatus === LeetcodeSyncStatus.SUCCESS &&
+    user.leetcodeLastSyncedAt &&
+    user.leetcodeLastSyncedAt >= scheduledFor
+  ) {
+    return { ok: true, kind: "skipped" };
   }
 
-  return { total: users.length, ok, failed };
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      leetcodeSyncStatus: LeetcodeSyncStatus.PENDING,
+      leetcodeSyncError: null,
+      leetcodeLastSyncAttemptAt: now,
+    },
+  });
+
+  try {
+    const profile = await fetchLeetCodePublicProfile(user.leetcodeUsername);
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...profileStatsData(profile),
+        leetcodeSyncStatus: LeetcodeSyncStatus.SUCCESS,
+        leetcodeSyncError: null,
+        leetcodeLastSyncedAt: now,
+      },
+    });
+    try {
+      await recordDailySnapshot(userId, profile, now);
+    } catch (snapshotError) {
+      console.warn(`Daily snapshot failed for user ${userId}:`, snapshotError);
+    }
+    return { ok: true, kind: "success" };
+  } catch (error) {
+    const message = syncErrorMessage(error);
+    await prisma.user.updateMany({
+      where: { id: userId, leetcodeLastSyncAttemptAt: now },
+      data: { leetcodeSyncStatus: LeetcodeSyncStatus.FAILED, leetcodeSyncError: message },
+    });
+    if (error instanceof LeetCodeProfileNotFoundError) {
+      return { ok: false, kind: "permanent", code: "PROFILE_NOT_FOUND", error: message };
+    }
+    return {
+      ok: false,
+      kind: "transient",
+      code: error instanceof LeetCodeRateLimitedError ? "RATE_LIMITED" : "UPSTREAM_FAILED",
+      error: message,
+    };
+  }
 }

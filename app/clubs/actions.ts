@@ -293,6 +293,7 @@ export async function decideClubMember(
       ...payload,
       recipientId: application.userId,
       actorId: gate.userId,
+      eventKey: `membership-application:${applicationId}:${decision.toLowerCase()}`,
     });
   });
   refresh(groupId, group.slug);
@@ -318,11 +319,13 @@ export async function changeClubMemberRole(
   )
     return err("You cannot make that role change.");
   await prisma.$transaction(async (tx) => {
+    const eventId = crypto.randomUUID();
     await tx.groupMembership.update({
       where: { groupId_userId: { groupId, userId } },
       data: { role },
     });
     await recordAudit(tx, {
+      id: eventId,
       actorId: gate.userId,
       groupId,
       action: "club.member.role_changed",
@@ -340,6 +343,7 @@ export async function changeClubMemberRole(
       }),
       recipientId: userId,
       actorId: gate.userId,
+      eventKey: `audit:${eventId}`,
     });
   });
   refresh(groupId, gate.group.slug);
@@ -366,6 +370,7 @@ export async function removeClubMember(
     select: { name: true },
   });
   await prisma.$transaction(async (tx) => {
+    const eventId = crypto.randomUUID();
     const changed = await tx.groupMembership.updateMany({
       where: { groupId, userId, status: "ACTIVE", role: { not: "OWNER" } },
       data: {
@@ -376,6 +381,7 @@ export async function removeClubMember(
       },
     });
     await recordAudit(tx, {
+      id: eventId,
       actorId: gate.userId,
       groupId,
       action: block ? "club.member.blocked" : "club.member.removed",
@@ -392,6 +398,7 @@ export async function removeClubMember(
         }),
         recipientId: userId,
         actorId: gate.userId,
+        eventKey: `audit:${eventId}`,
       });
     }
   });
@@ -483,6 +490,7 @@ export async function createClubAnnouncement(
         }),
         recipientIds: club.memberships.map((m) => m.userId),
         actorId: gate.userId,
+        eventKey: `announcement:${item.id}:published`,
       });
     }
   });

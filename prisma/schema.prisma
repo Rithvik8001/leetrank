@@ -61,6 +61,7 @@ model User {
   auditEvents AuditEvent[]
   notifications Notification[] @relation("NotificationRecipient")
   notificationsActed Notification[] @relation("NotificationActor")
+  syncRunItems SyncRunItem[]
 
   @@unique([email])
   @@unique([leetcodeUsername])
@@ -394,12 +395,78 @@ model Notification {
   body        String?
   href        String?
   metadata    Json?
+  eventKey    String?
   createdAt   DateTime         @default(now())
   readAt      DateTime?
 
   @@index([recipientId, createdAt])
   @@index([recipientId, readAt])
+  @@unique([recipientId, eventKey])
   @@map("notification")
+}
+
+enum SyncRunStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  PARTIAL
+  FAILED
+
+  @@map("sync_run_status")
+}
+
+enum SyncRunItemStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  SKIPPED
+  FAILED
+
+  @@map("sync_run_item_status")
+}
+
+model SyncRun {
+  id                         String        @id
+  scheduledFor               DateTime      @unique @db.Date
+  status                     SyncRunStatus @default(QUEUED)
+  startedAt                  DateTime?
+  heartbeatAt                DateTime?
+  challengeFinalizedAt       DateTime?
+  challengeNotificationsAt   DateTime?
+  terminalStageAttempts      Int           @default(0)
+  lastErrorCode              String?
+  lastError                  String?
+  finishedAt                 DateTime?
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+  items                      SyncRunItem[]
+
+  @@index([status, scheduledFor])
+  @@map("sync_run")
+}
+
+model SyncRunItem {
+  id            String            @id
+  runId         String
+  run           SyncRun           @relation(fields: [runId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status        SyncRunItemStatus @default(PENDING)
+  attempts      Int               @default(0)
+  leaseToken    String?
+  leasedAt      DateTime?
+  lastErrorCode String?
+  lastError     String?
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([runId, userId])
+  @@index([runId, status])
+  @@index([status, leasedAt])
+  @@index([userId])
+  @@map("sync_run_item")
 }
 
 enum NotificationType {

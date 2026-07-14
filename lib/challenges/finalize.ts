@@ -81,6 +81,7 @@ export async function finalizeEndedChallenges(now = new Date()) {
             finalDelta: row.delta,
           }),
           recipientId: row.userId,
+          eventKey: `challenge:${challenge.id}:finished:${row.id}`,
         });
       });
       finalized += 1;

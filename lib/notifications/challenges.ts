@@ -40,7 +40,11 @@ export async function generateChallengeNotifications(now = new Date()) {
         challengeId: challenge.id,
         challengeTitle: challenge.title,
       });
-      await recordNotifications(prisma, { ...payload, recipientIds });
+      await recordNotifications(prisma, {
+        ...payload,
+        recipientIds,
+        eventKey: `challenge:${challenge.id}:started:${today.toISOString().slice(0, 10)}`,
+      });
       started += 1;
     }
 
@@ -51,7 +55,11 @@ export async function generateChallengeNotifications(now = new Date()) {
         challengeId: challenge.id,
         challengeTitle: challenge.title,
       });
-      await recordNotifications(prisma, { ...payload, recipientIds });
+      await recordNotifications(prisma, {
+        ...payload,
+        recipientIds,
+        eventKey: `challenge:${challenge.id}:ending-soon:${tomorrow.toISOString().slice(0, 10)}`,
+      });
       endingSoon += 1;
     }
   }

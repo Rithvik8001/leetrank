@@ -109,7 +109,7 @@ export async function joinGroup(
   });
 
   try {
-    await prisma.groupMembership.upsert({
+    const membership = await prisma.groupMembership.upsert({
       where: { groupId_userId: { groupId: group.id, userId: gate.userId } },
       create: {
         id: crypto.randomUUID(),
@@ -124,6 +124,7 @@ export async function joinGroup(
         removedById: null,
         createdAt: new Date(),
       },
+      select: { id: true },
     });
     await recordNotification(prisma, {
       ...buildNotification({
@@ -134,6 +135,7 @@ export async function joinGroup(
       }),
       recipientId: group.ownerId,
       actorId: gate.userId,
+      eventKey: `group-membership:${membership.id}:joined`,
     });
   } catch (error) {
     // Unique-constraint race → treat as already a member.
@@ -208,6 +210,7 @@ export async function removeMember(
   });
 
   await prisma.$transaction(async (tx) => {
+    const eventId = crypto.randomUUID();
     const changed = await tx.groupMembership.updateMany({
       where: { groupId, userId, status: "ACTIVE" },
       data: {
@@ -226,6 +229,7 @@ export async function removeMember(
         }),
         recipientId: userId,
         actorId: owner.userId,
+        eventKey: `group-member-removed:${eventId}`,
       });
     }
   });

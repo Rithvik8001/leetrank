@@ -130,6 +130,7 @@ export async function reviewClubApplication(
       ...payload,
       recipientId: application.group.ownerId,
       actorId: admin.id,
+      eventKey: `club-application:${applicationId}:${decision.toLowerCase()}`,
     });
   });
   refresh(

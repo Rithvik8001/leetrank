@@ -62,6 +62,9 @@ export async function AuthHeader({ links }: { links: NavLink[] }) {
             {link.label}
           </Link>
         ))}
+        <Link href="/settings/security" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+          Security
+        </Link>
         <NotificationBell count={count} items={preview} />
         <LogoutButton />
       </div>

@@ -10,11 +10,11 @@ type NotifyDb = PrismaClient | Prisma.TransactionClient;
 // no-op (you don't notify yourself of your own action).
 export async function recordNotification(
   db: NotifyDb,
-  input: NotificationPayload & { recipientId: string; actorId?: string | null; metadata?: Prisma.InputJsonValue },
+  input: NotificationPayload & { recipientId: string; eventKey: string; actorId?: string | null; metadata?: Prisma.InputJsonValue },
 ) {
-  if (input.actorId && input.actorId === input.recipientId) return null;
-  return db.notification.create({
-    data: {
+  if (input.actorId && input.actorId === input.recipientId) return { count: 0 };
+  return db.notification.createMany({
+    data: [{
       id: crypto.randomUUID(),
       recipientId: input.recipientId,
       actorId: input.actorId ?? null,
@@ -27,7 +27,9 @@ export async function recordNotification(
       body: input.body,
       href: input.href,
       metadata: input.metadata,
-    },
+      eventKey: input.eventKey,
+    }],
+    skipDuplicates: true,
   });
 }
 
@@ -37,6 +39,7 @@ export async function recordNotifications(
   db: NotifyDb,
   input: NotificationPayload & {
     recipientIds: string[];
+    eventKey: string;
     actorId?: string | null;
     metadata?: Prisma.InputJsonValue;
   },
@@ -59,6 +62,8 @@ export async function recordNotifications(
       body: input.body,
       href: input.href,
       metadata: input.metadata,
+      eventKey: input.eventKey,
     })),
+    skipDuplicates: true,
   });
 }
